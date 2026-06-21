@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Кәсіп таңдау диагностикасы</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#6c5ce7;--purple-light:#a29bfe;--purple-bg:#f0eeff;
+  --green:#00b894;--blue:#0984e3;--orange:#e17055;--pink:#fd79a8;
+  --text:#2d2d2d;--gray:#888;--light:#f8f9fa;--border:#e0e0e0;
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;min-height:100vh;color:var(--text)}
+
+/* ── NAV ── */
+.nav{background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:16px;font-weight:800;color:var(--purple);display:flex;align-items:center;gap:8px}
+.nav-brand span{background:var(--purple);color:#fff;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;letter-spacing:.5px}
+.nav-back{background:none;border:none;color:var(--gray);font-size:14px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.nav-back:hover{color:var(--purple)}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:calc(100vh - 60px);padding:32px 16px}
+.screen.active{display:block}
+.container{max-width:680px;margin:0 auto}
+
+/* ── DASHBOARD ── */
+.hero{text-align:center;padding:40px 0 32px}
+.hero h1{font-size:32px;font-weight:900;margin-bottom:10px;background:linear-gradient(135deg,var(--purple),var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--gray);font-size:15px;max-width:440px;margin:0 auto}
+.tests-grid{display:grid;gap:16px}
+.test-card{background:#fff;border-radius:18px;box-shadow:0 4px 20px rgba(0,0,0,.07);padding:24px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:20px;border:2px solid transparent}
+.test-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.12);border-color:var(--purple)}
+.test-card.done{border-color:var(--green)}
+.test-icon{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.test-info h3{font-size:17px;font-weight:700;margin-bottom:4px}
+.test-info p{font-size:13px;color:var(--gray);line-height:1.4}
+.test-meta{font-size:12px;margin-top:8px;display:flex;gap:12px;flex-wrap:wrap}
+.badge{padding:3px 10px;border-radius:20px;font-weight:600}
+.done-mark{margin-left:auto;color:var(--green);font-size:20px;flex-shrink:0}
+
+/* ── CARD ── */
+.card{background:#fff;border-radius:20px;box-shadow:0 6px 32px rgba(0,0,0,.09);padding:36px 32px;margin-bottom:20px}
+@media(max-width:480px){.card{padding:24px 18px}}
+
+/* ── PROGRESS ── */
+.progress-wrap{background:#eee;border-radius:10px;height:8px;margin-bottom:6px;overflow:hidden}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--purple),var(--purple-light));border-radius:10px;transition:width .4s}
+.progress-info{display:flex;justify-content:space-between;font-size:12px;color:var(--gray);margin-bottom:24px}
+
+/* ── QUESTION ── */
+.q-label{font-size:11px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.q-text{font-size:18px;font-weight:700;line-height:1.5;margin-bottom:28px;color:var(--text)}
+.q-category{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;margin-bottom:16px;font-weight:600}
+
+/* Holland Yes/No */
+.yn-buttons{display:flex;gap:12px}
+.yn-btn{flex:1;padding:16px;border-radius:14px;border:2px solid var(--border);background:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:all .15s}
+.yn-btn.yes:hover,.yn-btn.yes.selected{background:var(--green);border-color:var(--green);color:#fff}
+.yn-btn.no:hover,.yn-btn.no.selected{background:#dfe6e9;border-color:#b2bec3;color:#636e72}
+
+/* Scale 1–10 */
+.scale-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--gray);margin-bottom:8px}
+.scale-buttons{display:flex;gap:4px;flex-wrap:wrap}
+.scale-btn{flex:1;min-width:36px;padding:10px 0;border-radius:10px;border:2px solid var(--border);background:#fff;font-size:13px;font-weight:700;color:var(--gray);cursor:pointer;transition:all .15s;text-align:center}
+.scale-btn:hover{border-color:var(--purple);color:var(--purple)}
+.scale-btn.selected{background:var(--purple);border-color:var(--purple);color:#fff}
+
+/* Value ranking */
+.value-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--light);border-radius:12px;margin-bottom:8px;border:2px solid transparent}
+.value-item.selected-val{border-color:var(--purple);background:var(--purple-bg)}
+.value-text{flex:1;font-size:14px;font-weight:600}
+.star-row{display:flex;gap:4px}
+.star{font-size:20px;cursor:pointer;color:#ddd;transition:color .1s}
+.star.lit{color:#f9ca24}
+
+/* Buttons */
+.btn-row{display:flex;gap:12px;margin-top:28px}
+.btn{flex:1;padding:14px;border-radius:13px;border:none;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple-light));color:#fff;box-shadow:0 4px 16px rgba(108,92,231,.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(108,92,231,.4)}
+.btn-primary:disabled{background:#ccc;box-shadow:none;transform:none;cursor:not-allowed}
+.btn-secondary{background:#f0f0f0;color:#666}
+.btn-secondary:hover{background:#e0e0e0}
+
+/* ── INSTRUCTION ── */
+.instr-box{background:var(--purple-bg);border-left:4px solid var(--purple);border-radius:12px;padding:20px;font-size:14px;line-height:1.7;color:#444;margin-bottom:24px}
+.instr-box p{margin-bottom:10px}
+.instr-box p:last-child{margin-bottom:0}
+
+/* ── RESULTS ── */
+.result-hero{text-align:center;padding:20px 0 28px}
+.result-hero h2{font-size:22px;font-weight:800;margin-bottom:8px}
+.result-hero p{color:var(--gray);font-size:14px}
+.top-card{border-radius:18px;padding:24px;color:#fff;margin-bottom:24px;text-align:center}
+.top-card h3{font-size:14px;font-weight:600;opacity:.8;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+.top-types{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+.type-chip{background:rgba(255,255,255,.2);border-radius:12px;padding:12px 20px;font-size:15px;font-weight:700}
+.type-chip small{display:block;font-size:11px;opacity:.8;margin-bottom:2px;font-weight:400}
+.bars-section h3{font-size:13px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.bar-item{margin-bottom:14px}
+.bar-label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px}
+.bar-label span{color:var(--purple)}
+.bar-bg{background:#eee;border-radius:8px;height:10px}
+.bar-fill{height:10px;border-radius:8px;transition:width .9s ease}
+.careers-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.career-pill{background:var(--purple-bg);color:var(--purple);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;text-align:center}
+.section-divider{height:1px;background:var(--border);margin:24px 0}
+.summary-btn{display:block;width:100%;padding:14px;border-radius:13px;background:var(--purple-bg);color:var(--purple);border:2px solid var(--purple);font-size:15px;font-weight:700;cursor:pointer;margin-top:12px;text-align:center}
+.summary-btn:hover{background:var(--purple);color:#fff}
+.print-btn{display:block;width:100%;padding:13px;border-radius:13px;background:#fff;color:var(--gray);border:2px solid var(--border);font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+.print-btn:hover{border-color:var(--gray)}
+.result-mini-card{background:var(--light);border-radius:14px;padding:18px;margin-bottom:12px}
+.result-mini-card h4{font-size:13px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+
+/* ── SUMMARY DASHBOARD ── */
+.summary-section{margin-bottom:20px}
+.summary-section h2{font-size:18px;font-weight:800;margin-bottom:14px}
+.anchor-result{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--light);border-radius:12px;margin-bottom:8px}
+.anchor-result .name{flex:1;font-size:13px;font-weight:600}
+.anchor-result .score{font-size:14px;font-weight:700;color:var(--purple)}
+
+/* TYPE COLORS */
+.color-R{background:#e17055}.color-I{background:#0984e3}.color-A{background:#fd79a8}
+.color-S{background:#00b894}.color-E{background:#e67e22}.color-C{background:#6c5ce7}
+.fill-R{background:#e17055}.fill-I{background:#0984e3}.fill-A{background:#fd79a8}
+.fill-S{background:#00b894}.fill-E{background:#e67e22}.fill-C{background:#6c5ce7}
+.fill-anchor{background:linear-gradient(90deg,var(--purple),var(--purple-light))}
+.fill-value{background:linear-gradient(90deg,var(--orange),#fdcb6e)}
+
+@media print{
+  .nav,.btn-row,.print-btn,.summary-btn{display:none!important}
+  body{background:#fff}
+  .card{box-shadow:none;border:1px solid #eee}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <span>ПРОФОРИЕНТАЦИЯ</span> Кәсіп таңдау
+  </div>
+  <button class="nav-back" id="nav-back-btn" onclick="navBack()" style="display:none">← Артқа</button>
+</nav>
+
+<!-- ════════════ DASHBOARD ════════════ -->
+<div class="screen active" id="screen-dashboard">
+<div class="container">
+  <div class="hero">
+    <h1>Кәсіп таңдау диагностикасы</h1>
+    <p>Өзіңді танып, болашақ кәсібіңді анықтауға арналған ғылыми негізделген тесттер</p>
+  </div>
+  <div class="tests-grid">
+
+    <div class="test-card" onclick="startHolland()" id="card-holland">
+      <div class="test-icon" style="background:#fff0eb">🧭</div>
+      <div class="test-info">
+        <h3>Холланд RIASEC тесті</h3>
+        <p>Кәсіби тұлға типіңді анықта — қандай іс-әрекет саған жақын?</p>
+        <div class="test-meta">
+          <span class="badge" style="background:#fff0eb;color:#e17055">42 сұрақ</span>
+          <span class="badge" style="background:#f0f0f0;color:#666">Иә / Жоқ</span>
+          <span class="badge" style="background:#f0f0f0;color:#666">~10 мин</span>
+        </div>
+      </div>
+      <div class="done-mark" id="done-holland" style="display:none">✓</div>
+    </div>
+
+    <div class="test-card" onclick="startAnchors()" id="card-anchors">
+      <div class="test-icon" style="background:#eefaf7">⚓</div>
+      <div class="test-info">
+        <h3>Шейн мансап жетектері</h3>
+        <p>Жұмыста не маңызды екенін анықта — 9 кәсіби құндылықты бағала</p>
+        <div class="test-meta">
+          <span class="badge" style="background:#eefaf7;color:#00b894">40 сұрақ</span>
+          <span class="badge" style="background:#f0f0f0;color:#666">1–10 шкала</span>
+          <span class="badge" style="background:#f0f0f0;color:#666">~12 мин</span>
+        </div>
+      </div>
+      <div class="done-mark" id="done-anchors" style="display:none">✓</div>
+    </div>
+
+    <div class="test-card" onclick="startValues()" id="card-values">
+      <div class="test-icon" style="background:#fff8e1">💎</div>
+      <div class="test-info">
+        <h3>Рокич құндылықтар тесті</h3>
+        <p>Өміріңде не бірінші орынға шығады? Жизнь бағдарыңды анықта</p>
+        <div class="test-meta">
+          <span class="badge" style="background:#fff8e1;color:#e67e22">36 құндылық</span>
+          <span class="badge" style="background:#f0f0f0;color:#666">Жұлдыз бағасы</span>
+          <span class="badge" style="background:#f0f0f0;color:#666">~10 мин</span>
+        </div>
+      </div>
+      <div class="done-mark" id="done-values" style="display:none">✓</div>
+    </div>
+
+    <div class="test-card" id="card-summary" onclick="showSummary()" style="opacity:.4;cursor:not-allowed" id="card-sum">
+      <div class="test-icon" style="background:#f0eeff">📊</div>
+      <div class="test-info">
+        <h3>Жалпы нәтиже</h3>
+        <p>Барлық тесттерді өткізгеннен кейін кешенді нәтиже мен кәсіп ұсыныстары ашылады</p>
+        <div class="test-meta">
+          <span class="badge" style="background:#f0eeff;color:#6c5ce7">Барлық тесттер қажет</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ════════════ HOLLAND ════════════ -->
+<div class="screen" id="screen-holland-instr">
+<div class="container">
+  <div class="card">
+    <div style="font-size:48px;text-align:center;margin-bottom:16px">🧭</div>
+    <h1 style="text-align:center;margin-bottom:8px">Холланд RIASEC тесті</h1>
+    <p style="text-align:center;color:var(--gray);margin-bottom:24px">Кәсіби тұлға типін анықтау</p>
+    <div class="instr-box">
+      <p>Бұл тест сізге <strong>қандай іс-әрекет, орта және жұмыс түрлері сәйкес келетінін</strong> анықтайды.</p>
+      <p>Алдыңызда <strong>42 тұжырым</strong> болады. Әр тұжырымды оқып, өзіңізге сәйкес келсе — <strong>«Иә»</strong>, сәйкес келмесе — <strong>«Жоқ»</strong> деп таңдаңыз.</p>
+      <p>Дұрыс немесе бұрыс жауап жоқ. Бірінші ойыңызды таңдаңыз.</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo('screen-dashboard')">Артқа</button>
+      <button class="btn btn-primary" onclick="startHollandTest()">Бастау →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="screen-holland-test">
+<div class="container">
+  <div class="card">
+    <div class="progress-wrap"><div class="progress-bar" id="h-progress"></div></div>
+    <div class="progress-info">
+      <span id="h-type-label"></span>
+      <span id="h-counter"></span>
+    </div>
+    <div class="q-label">Сұрақ</div>
+    <div class="q-text" id="h-q-text"></div>
+    <div class="yn-buttons">
+      <button class="yn-btn yes" onclick="hollandAnswer(1)">✓ Иә</button>
+      <button class="yn-btn no" onclick="hollandAnswer(0)">✗ Жоқ</button>
+    </div>
+    <div class="btn-row" style="margin-top:20px">
+      <button class="btn btn-secondary" onclick="hollandPrev()">← Артқа</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="screen-holland-result">
+<div class="container">
+  <div class="card">
+    <div class="result-hero">
+      <div style="font-size:48px;margin-bottom:12px">🎯</div>
+      <h2>Сіздің кәсіби типіңіз</h2>
+      <p>Холланд RIASEC тесті нәтижесі</p>
+    </div>
+    <div class="top-card" id="h-top-card">
+      <h3>Басты типтер</h3>
+      <div class="top-types" id="h-top-types"></div>
+    </div>
+    <div class="bars-section">
+      <h3>Барлық типтер бойынша</h3>
+      <div id="h-bars"></div>
+    </div>
+    <div class="section-divider"></div>
+    <h3 style="margin-bottom:12px;font-size:15px">Ұсынылатын кәсіп бағыттары</h3>
+    <div class="careers-grid" id="h-careers"></div>
+    <div class="btn-row" style="margin-top:24px">
+      <button class="btn btn-secondary" onclick="goTo('screen-dashboard')">← Басты бет</button>
+      <button class="btn btn-primary" onclick="startAnchors()">Келесі тест →</button>
+    </div>
+    <button class="print-btn" onclick="window.print()">🖨 Басып шығару</button>
+  </div>
+</div>
+</div>
+
+<!-- ════════════ ANCHORS ════════════ -->
+<div class="screen" id="screen-anchors-instr">
+<div class="container">
+  <div class="card">
+    <div style="font-size:48px;text-align:center;margin-bottom:16px">⚓</div>
+    <h1 style="text-align:center;margin-bottom:8px">Шейн мансап жетектері</h1>
+    <p style="text-align:center;color:var(--gray);margin-bottom:24px">Кәсіби құндылықтарды анықтау</p>
+    <div class="instr-box">
+      <p><strong>Мансап жетегі</strong> — жұмыста сізге ең маңызды болып, еш уақытта бас тартқыңыз келмейтін нәрсе.</p>
+      <p>Алдыңызда <strong>40 тұжырым</strong> болады. Әр тұжырымды <strong>1-ден 10-ға дейін</strong> бағалаңыз:</p>
+      <p><strong>1</strong> = мүлде маңызды емес &nbsp;&nbsp; <strong>10</strong> = өте маңызды</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo('screen-dashboard')">Артқа</button>
+      <button class="btn btn-primary" onclick="startAnchorsTest()">Бастау →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="screen-anchors-test">
+<div class="container">
+  <div class="card">
+    <div class="progress-wrap"><div class="progress-bar" id="a-progress"></div></div>
+    <div class="progress-info">
+      <span id="a-anchor-label"></span>
+      <span id="a-counter"></span>
+    </div>
+    <div class="q-label">Тұжырым</div>
+    <div class="q-text" id="a-q-text"></div>
+    <div class="scale-labels">
+      <span>Мүлде маңызды емес</span>
+      <span>Өте маңызды</span>
+    </div>
+    <div class="scale-buttons" id="a-scale"></div>
+    <div class="btn-row" style="margin-top:20px">
+      <button class="btn btn-secondary" onclick="anchorPrev()">← Артқа</button>
+      <button class="btn btn-primary" id="a-next-btn" onclick="anchorNext()" disabled>Келесі →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="screen-anchors-result">
+<div class="container">
+  <div class="card">
+    <div class="result-hero">
+      <div style="font-size:48px;margin-bottom:12px">⚓</div>
+      <h2>Сіздің мансап жетектеріңіз</h2>
+      <p>Шейн тесті нәтижесі</p>
+    </div>
+    <div class="top-card" style="background:linear-gradient(135deg,#00b894,#55efc4)">
+      <h3>Ең маңызды жетектер</h3>
+      <div id="a-top-anchors"></div>
+    </div>
+    <div class="bars-section" style="margin-top:24px">
+      <h3>Барлық жетектер</h3>
+      <div id="a-bars"></div>
+    </div>
+    <div class="btn-row" style="margin-top:24px">
+      <button class="btn btn-secondary" onclick="goTo('screen-dashboard')">← Басты бет</button>
+      <button class="btn btn-primary" onclick="startValues()">Келесі тест →</button>
+    </div>
+    <button class="print-btn" onclick="window.print()">🖨 Басып шығару</button>
+  </div>
+</div>
+</div>
+
+<!-- ════════════ VALUES ════════════ -->
+<div class="screen" id="screen-values-instr">
+<div class="container">
+  <div class="card">
+    <div style="font-size:48px;text-align:center;margin-bottom:16px">💎</div>
+    <h1 style="text-align:center;margin-bottom:8px">Рокич құндылықтар тесті</h1>
+    <p style="text-align:center;color:var(--gray);margin-bottom:24px">Өмірлік бағдарлар мен ішкі ынта</p>
+    <div class="instr-box">
+      <p>Тест <strong>өміріңізде нені маңызды деп санайтыныңызды</strong> анықтайды — бұл болашақта кәсіп таңдауға тікелей әсер етеді.</p>
+      <p>Тізімде <strong>36 құндылық</strong> берілген. Әр құндылықты <strong>жұлдызша</strong> арқылы бағалаңыз:</p>
+      <p>⭐ = аздап маңызды &nbsp; ⭐⭐⭐ = маңызды &nbsp; ⭐⭐⭐⭐⭐ = өте маңызды</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo('screen-dashboard')">Артқа</button>
+      <button class="btn btn-primary" onclick="startValuesTest()">Бастау →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="screen-values-test">
+<div class="container">
+  <div class="card">
+    <h2 style="margin-bottom:6px" id="v-section-title"></h2>
+    <p style="color:var(--gray);font-size:13px;margin-bottom:20px" id="v-section-desc"></p>
+    <div id="v-values-list"></div>
+    <div class="btn-row" style="margin-top:24px">
+      <button class="btn btn-secondary" id="v-back-btn" onclick="valuesPrev()">← Артқа</button>
+      <button class="btn btn-primary" id="v-next-btn" onclick="valuesNext()">Келесі →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="screen" id="screen-values-result">
+<div class="container">
+  <div class="card">
+    <div class="result-hero">
+      <div style="font-size:48px;margin-bottom:12px">💎</div>
+      <h2>Сіздің құндылықтарыңыз</h2>
+      <p>Рокич тесті нәтижесі</p>
+    </div>
+    <div class="top-card" style="background:linear-gradient(135deg,#e67e22,#f9ca24)">
+      <h3>Ең жоғары бағаланған құндылықтар</h3>
+      <div id="v-top-values"></div>
+    </div>
+    <div class="section-divider"></div>
+    <div class="bars-section">
+      <h3>Барлық категориялар</h3>
+      <div id="v-cat-bars"></div>
+    </div>
+    <div class="btn-row" style="margin-top:24px">
+      <button class="btn btn-secondary" onclick="goTo('screen-dashboard')">← Басты бет</button>
+      <button class="btn btn-primary" onclick="showSummary()">Жалпы нәтиже →</button>
+    </div>
+    <button class="print-btn" onclick="window.print()">🖨 Басып шығару</button>
+  </div>
+</div>
+</div>
+
+<!-- ════════════ SUMMARY ════════════ -->
+<div class="screen" id="screen-summary">
+<div class="container">
+  <div class="card">
+    <div style="font-size:48px;text-align:center;margin-bottom:16px">📊</div>
+    <h1 style="text-align:center;margin-bottom:8px">Кешенді нәтіже</h1>
+    <p style="text-align:center;color:var(--gray);margin-bottom:28px">Барлық диагностика нәтижелері</p>
+    <div id="summary-content"></div>
+    <div class="btn-row" style="margin-top:24px">
+      <button class="btn btn-secondary" onclick="goTo('screen-dashboard')">← Басты бет</button>
+    </div>
+    <button class="print-btn" onclick="window.print()">🖨 Толық нәтижені басып шығару</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+
+// ── HOLLAND 42 questions (6 types × 7) ──
+const HOLLAND = {
+  R: {
+    name: 'Реалистік', nameKk: 'Реалистік (R)',
+    color: 'color-R', fill: 'fill-R',
+    desc: 'Техникалық, практикалық, физикалық жұмысты ұнататын тұлға типі',
+    questions: [
+      'Техникалық немесе механикалық жұмыстарды орындауды ұнатамын',
+      'Аспаптар мен жабдықтармен жұмыс жасауды ұнатамын',
+      'Нәрселерді өз қолыммен жасауды немесе жөндеуді ұнатамын',
+      'Ашық ауада немесе табиғатта жұмыс жасауды ұнатамын',
+      'Машина немесе электр жабдықтарымен жұмыс жасауды ұнатамын',
+      'Дене жаттығулары мен физикалық белсенділікті ұнатамын',
+      'Нақты, практикалық мәселелерді шешуді ұнатамын',
+    ],
+    careers: ['Инженер','Техник','Архитектор','Пилот','Дәрігер-хирург','Агроном','Спортшы','Электрик']
+  },
+  I: {
+    name: 'Зерттеушілік', nameKk: 'Зерттеушілік (I)',
+    color: 'color-I', fill: 'fill-I',
+    desc: 'Зерттеу, талдау және ғылыми ойлауды ұнататын тұлға типі',
+    questions: [
+      'Ғылыми зерттеулер жүргізуді ұнатамын',
+      'Күрделі мәселелерді терең талдауды ұнатамын',
+      'Математика немесе жаратылыстану ғылымдарымен айналысуды ұнатамын',
+      'Жаңа ақпаратты кітаптан немесе интернеттен оқуды ұнатамын',
+      'Гипотезалар ұсынып, оларды тексеруді ұнатамын',
+      'Лаборатория немесе эксперимент жұмыстарын жасауды ұнатамын',
+      'Жасырын себептерді немесе заңдылықтарды іздеуді ұнатамын',
+    ],
+    careers: ['Ғалым','Дәрігер','IT-маман','Экономист','Математик','Биолог','Психолог','Деректер аналитигі']
+  },
+  A: {
+    name: 'Артистік', nameKk: 'Артистік (A)',
+    color: 'color-A', fill: 'fill-A',
+    desc: 'Шығармашылық, өнер және өзін-өзі білдіруді ұнататын тұлға типі',
+    questions: [
+      'Музыка ойнауды немесе тыңдауды ұнатамын',
+      'Сурет салуды немесе дизайнмен айналысуды ұнатамын',
+      'Өлең, әңгіме немесе эссе жазуды ұнатамын',
+      'Театр немесе кино өнерімен айналысуды ұнатамын',
+      'Шығармашылық жобаларды жасауды ұнатамын',
+      'Өзімді өнер арқылы білдіруді ұнатамын',
+      'Дизайн немесе сәндеу жұмыстарын ұнатамын',
+    ],
+    careers: ['Дизайнер','Суретші','Музыкант','Жазушы','Режиссер','Фотограф','Сәулетші','Маркетолог']
+  },
+  S: {
+    name: 'Әлеуметтік', nameKk: 'Әлеуметтік (S)',
+    color: 'color-S', fill: 'fill-S',
+    desc: 'Адамдармен жұмыс, оқыту және көмек көрсетуді ұнататын тұлға типі',
+    questions: [
+      'Адамдарға нәрсе үйретуді немесе оқытуды ұнатамын',
+      'Мұқтаж адамдарға қолұшын беруді ұнатамын',
+      'Адамдардың мәселелерін шешуге көмектесуді ұнатамын',
+      'Топтық іс-шаралар ұйымдастыруды ұнатамын',
+      'Жаңа адамдармен танысуды ұнатамын',
+      'Психологиялық немесе эмоционалды мәселелер жайлы сөйлесуді ұнатамын',
+      'Кеңес немесе психологиялық қолдау беруді ұнатамын',
+    ],
+    careers: ['Мұғалім','Дәрігер','Психолог','Әлеуметтік қызметкер','HR маман','Тренер','Медбике','Волонтер жетекшісі']
+  },
+  E: {
+    name: 'Кәсіпкерлік', nameKk: 'Кәсіпкерлік (E)',
+    color: 'color-E', fill: 'fill-E',
+    desc: 'Лидерлік, кәсіпкерлік және адамдарды сендіруді ұнататын тұлға типі',
+    questions: [
+      'Жобаларды басқаруды және ұйымдастыруды ұнатамын',
+      'Адамдарды өз идеяма сендіре алу маған жақсы шығады',
+      'Жаңа бизнес идеяларын ойлауды ұнатамын',
+      'Лидер ретінде топты жетелеуді ұнатамын',
+      'Жарнама немесе сатумен айналысуды ұнатамын',
+      'Конкурс немесе бәсекеде жеңуді ұнатамын',
+      'Тәуекелге барып жаңа нәрсе бастауды ұнатамын',
+    ],
+    careers: ['Кәсіпкер','Менеджер','Заңгер','Саясаткер','Жарнамашы','PR маман','Жоба жетекшісі','Брокер']
+  },
+  C: {
+    name: 'Конвенциялды', nameKk: 'Конвенциялды (C)',
+    color: 'color-C', fill: 'fill-C',
+    desc: 'Жүйелілік, тәртіп және нақты ережелер бойынша жұмысты ұнататын тұлға типі',
+    questions: [
+      'Деректерді жүйелеуді және тіркеуді ұнатамын',
+      'Нақты нұсқаулықтар мен ережелерді орындауды ұнатамын',
+      'Кестелер, есептер немесе таблицалар жасауды ұнатамын',
+      'Қаржылық есептермен немесе бухгалтериямен айналысуды ұнатамын',
+      'Ретті, тыныш жұмыс ортасында болуды ұнатамын',
+      'Компьютерде деректерді өңдеуді ұнатамын',
+      'Нақты алгоритм немесе жоспар бойынша жұмыс жасауды ұнатамын',
+    ],
+    careers: ['Бухгалтер','Экономист','Банкир','IT-маман','Статистик','Заңгер','Архивист','Логист']
+  }
+};
+
+const HOLLAND_TYPES = ['R','I','A','S','E','C'];
+// Flatten questions with type
+const H_QUESTIONS = [];
+HOLLAND_TYPES.forEach(t => {
+  HOLLAND[t].questions.forEach(q => H_QUESTIONS.push({type:t, text:q}));
+});
+// Shuffle
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+let H_SHUFFLED = [];
+let hAnswers = [];
+let hCurrent = 0;
+
+// ── ANCHORS (Schein) 40 questions × 9 anchors ──
+const ANCHORS = [
+  {
+    name: 'Кәсіби шеберлік',
+    desc: 'Өз ісінің шебері болу, тереңдетілген білім мен дағды',
+    questions: [
+      'Өз мамандығымда ең жақсы болуды маңызды деп санаймын',
+      'Терең білім мен тәжірибе жинақтау маған жұмыста ең маңызды',
+      'Кәсіби шебер ретінде мойындалу маған өте маңызды',
+      'Жұмысымда жоғары сапаға жету маған ең үлкен мотивация',
+    ]
+  },
+  {
+    name: 'Басқарушылық',
+    desc: 'Адамдарды жетелеу, жауапкершілік пен лауазым',
+    questions: [
+      'Адамдарды басқару және шешімдер қабылдау маған маңызды',
+      'Жоғары лауазым мен мәртебеге ие болу маған маңызды',
+      'Команданы жетелеу және нәтижеге жету маним маңызды',
+      'Ұйымды немесе бизнесті басқару маған маңызды',
+    ]
+  },
+  {
+    name: 'Дербестік',
+    desc: 'Еркіндік, тәуелсіздік, өзінің жоспарлауы',
+    questions: [
+      'Жұмысты өзімше ұйымдастыру және жоспарлау маған маңызды',
+      'Ешкімге тәуелді болмай, дербес шешімдер қабылдау маған маңызды',
+      'Еркін кесте мен жұмыс орны маған маңызды',
+      'Нұсқауларсыз өз бетімше жұмыс жасай алу маған маңызды',
+    ]
+  },
+  {
+    name: 'Тұрақтылық',
+    desc: 'Сенімді жұмыс, болашаққа кепілдік',
+    questions: [
+      'Тұрақты жалақы мен сенімді жұмыс орны маған маңызды',
+      'Жұмысымды жоғалту қаупінсіз жұмыс жасау маған маңызды',
+      'Болашаққа деген сенімділік маған маңызды',
+      'Зейнетақы мен әлеуметтік кепілдіктер маған маңызды',
+    ]
+  },
+  {
+    name: 'Қызмет ету',
+    desc: 'Адамдарға, қоғамға немесе дүниеге пайда беру',
+    questions: [
+      'Жұмысым арқылы адамдарға пайда келтіру маған маңызды',
+      'Қоғамға оң өзгеріс енгізу маған маңызды',
+      'Жұмысымның қоғамдық маңызы болуы маған маңызды',
+      'Адамдардың өміріне жақсы ықпал ету маған маңызды',
+    ]
+  },
+  {
+    name: 'Бәсеке мен қиындықтар',
+    desc: 'Күрделі міндеттер, жеңіс, кедергілерді жеңу',
+    questions: [
+      'Күрделі мәселелерді шешу маған ынталандырады',
+      'Бәсеке жағдайында жеңіске жету маған маңызды',
+      'Қиын тапсырмаларды орындау маған маңызды',
+      'Шектеулерді жеңіп, жаңа биіктерге жету маған маңызды',
+    ]
+  },
+  {
+    name: 'Кәсіпкерлік',
+    desc: 'Өз ісін ашу, жаңа нәрсе жасау',
+    questions: [
+      'Өз бизнесімді немесе жобамды ашу маған маңызды',
+      'Жаңа өнім немесе қызмет жасап шығару маған маңызды',
+      'Кәсіпкер болып өз ережелерімен жұмыс жасау маным маңызды',
+      'Тәуекелге барып жаңа нәрсе бастау маған маңызды',
+    ]
+  },
+  {
+    name: 'Өмірдің тепе-теңдігі',
+    desc: 'Жұмыс пен жеке өмір арасындағы баланс',
+    questions: [
+      'Жұмыс пен жеке өмірдің тепе-теңдігі маған маңызды',
+      'Жұмыстың отбасыма кедергі болмауы маған маңызды',
+      'Бос уақытым мен хоббиге уақыт қалдыру маным маңызды',
+      'Психологиялық денсаулығым мен демалысым маған маңызды',
+    ]
+  },
+  {
+    name: 'Шығармашылық',
+    desc: 'Жаңа идеялар, инновация, шығармашылық еркіндік',
+    questions: [
+      'Шығармашылық идеяларды іске асыру маған маңызды',
+      'Инновациялық шешімдер табу маған маңызды',
+      'Жаңа нәрсе ойлап, оны жасау маған маңызды',
+      'Жұмыста шығармашылық еркіндігім болуы маным маңызды',
+    ]
+  }
+];
+
+const A_QUESTIONS = [];
+ANCHORS.forEach((a,i) => {
+  a.questions.forEach(q => A_QUESTIONS.push({anchor:i, text:q}));
+});
+
+let aAnswers = [];
+let aCurrent = 0;
+
+// ── VALUES (Rokeach) ──
+const VALUES_TERMINAL = [
+  {text:'Бақытты отбасы өмірі', cat:'Қарым-қатынас'},
+  {text:'Шынайы достық', cat:'Қарым-қатынас'},
+  {text:'Махаббат', cat:'Қарым-қатынас'},
+  {text:'Сүйікті жұмыс', cat:'Кәсіп'},
+  {text:'Материалдық тұрақтылық', cat:'Кәсіп'},
+  {text:'Мансаптық жетістік', cat:'Кәсіп'},
+  {text:'Білім мен даналық', cat:'Өзін дамыту'},
+  {text:'Шығармашылық', cat:'Өзін дамыту'},
+  {text:'Дамыған тұлғалық', cat:'Өзін дамыту'},
+  {text:'Денсаулық', cat:'Денсаулық'},
+  {text:'Тыныштық пен қауіпсіздік', cat:'Денсаулық'},
+  {text:'Ішкі үйлесімділік', cat:'Денсаулық'},
+  {text:'Бостандық', cat:'Еркіндік'},
+  {text:'Дербестік', cat:'Еркіндік'},
+  {text:'Мазмұнды өмір', cat:'Еркіндік'},
+  {text:'Қоғамға пайда', cat:'Қоғам'},
+  {text:'Теңдік және әділеттілік', cat:'Қоғам'},
+  {text:'Ұлттық мақтаныш', cat:'Қоғам'},
+];
+
+const VALUES_INSTRUMENTAL = [
+  {text:'Адалдық', cat:'Моральдік'},
+  {text:'Жауапкершілік', cat:'Моральдік'},
+  {text:'Шыдамдылық', cat:'Моральдік'},
+  {text:'Ерте тұру мен еңбекқорлық', cat:'Еңбек'},
+  {text:'Тиімділік пен ұқыптылық', cat:'Еңбек'},
+  {text:'Тәртіп пен ережелерді сақтау', cat:'Еңбек'},
+  {text:'Батылдық', cat:'Тұлға'},
+  {text:'Мықты ерік-жігер', cat:'Тұлға'},
+  {text:'Өзіне сенімділік', cat:'Тұлға'},
+  {text:'Ақыл-ой кеңдігі', cat:'Ақыл'},
+  {text:'Логикалық ойлау', cat:'Ақыл'},
+  {text:'Білімге деген ынта', cat:'Ақыл'},
+  {text:'Қуаныш пен жайдарылық', cat:'Эмоция'},
+  {text:'Сүйіспеншілік пен жанашырлық', cat:'Эмоция'},
+  {text:'Мейірімділік', cat:'Эмоция'},
+  {text:'Тазалық (рухани және дене)', cat:'Гигиена'},
+  {text:'Тәрбиелілік', cat:'Гигиена'},
+  {text:'Дін немесе рухани сенім', cat:'Гигиена'},
+];
+
+let vScoresTerminal = new Array(18).fill(0);
+let vScoresInstr = new Array(18).fill(0);
+let vSection = 0; // 0 = terminal, 1 = instrumental
+
+// ── RESULTS STATE ──
+const results = {holland:null, anchors:null, values:null};
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  const isDash = id==='screen-dashboard';
+  document.getElementById('nav-back-btn').style.display = isDash?'none':'block';
+  updateDashboard();
+}
+function navBack(){goTo('screen-dashboard')}
+
+function updateDashboard(){
+  ['holland','anchors','values'].forEach(t=>{
+    const el=document.getElementById('done-'+t);
+    if(el) el.style.display = results[t]?'block':'none';
+  });
+  const allDone = results.holland && results.anchors && results.values;
+  const card = document.getElementById('card-summary');
+  if(card){
+    card.style.opacity = allDone?'1':'0.4';
+    card.style.cursor = allDone?'pointer':'not-allowed';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HOLLAND
+// ═══════════════════════════════════════════════════════════
+function startHolland(){goTo('screen-holland-instr')}
+function startHollandTest(){
+  H_SHUFFLED = shuffle([...H_QUESTIONS]);
+  hAnswers = new Array(H_SHUFFLED.length).fill(null);
+  hCurrent = 0;
+  renderHollandQ();
+  goTo('screen-holland-test');
+}
+function renderHollandQ(){
+  const q = H_SHUFFLED[hCurrent];
+  document.getElementById('h-q-text').textContent = q.text;
+  document.getElementById('h-counter').textContent = `${hCurrent+1} / ${H_SHUFFLED.length}`;
+  document.getElementById('h-type-label').textContent = HOLLAND[q.type].nameKk;
+  document.getElementById('h-progress').style.width = `${(hCurrent/H_SHUFFLED.length)*100}%`;
+  // Restore selection
+  document.querySelectorAll('.yn-btn').forEach(b=>b.classList.remove('selected'));
+  if(hAnswers[hCurrent]===1) document.querySelector('.yn-btn.yes').classList.add('selected');
+  if(hAnswers[hCurrent]===0) document.querySelector('.yn-btn.no').classList.add('selected');
+}
+function hollandAnswer(val){
+  hAnswers[hCurrent]=val;
+  document.querySelectorAll('.yn-btn').forEach(b=>b.classList.remove('selected'));
+  if(val===1) document.querySelector('.yn-btn.yes').classList.add('selected');
+  else document.querySelector('.yn-btn.no').classList.add('selected');
+  setTimeout(()=>{
+    if(hCurrent<H_SHUFFLED.length-1){hCurrent++;renderHollandQ();}
+    else showHollandResult();
+  },220);
+}
+function hollandPrev(){if(hCurrent>0){hCurrent--;renderHollandQ();}}
+
+function showHollandResult(){
+  const scores={R:0,I:0,A:0,S:0,E:0,C:0};
+  H_SHUFFLED.forEach((q,i)=>{if(hAnswers[i]===1)scores[q.type]++;});
+  results.holland=scores;
+
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const top=sorted.slice(0,3);
+  const topCard=document.getElementById('h-top-card');
+  topCard.className='top-card '+HOLLAND[top[0][0]].color;
+
+  document.getElementById('h-top-types').innerHTML=top.map(([t,s])=>`
+    <div class="type-chip">
+      <small>${HOLLAND[t].nameKk}</small>
+      ${HOLLAND[t].name} — ${s}/7
+    </div>`).join('');
+
+  document.getElementById('h-bars').innerHTML=sorted.map(([t,s])=>`
+    <div class="bar-item">
+      <div class="bar-label">${HOLLAND[t].nameKk}<span>${s}/7</span></div>
+      <div class="bar-bg"><div class="bar-fill ${HOLLAND[t].fill}" style="width:${(s/7)*100}%"></div></div>
+    </div>`).join('');
+
+  const topCareers=[...new Set(top.flatMap(([t])=>HOLLAND[t].careers))].slice(0,8);
+  document.getElementById('h-careers').innerHTML=topCareers.map(c=>`<div class="career-pill">${c}</div>`).join('');
+
+  goTo('screen-holland-result');
+  updateDashboard();
+}
+
+// ═══════════════════════════════════════════════════════════
+// ANCHORS
+// ═══════════════════════════════════════════════════════════
+function startAnchors(){goTo('screen-anchors-instr')}
+function startAnchorsTest(){
+  aAnswers = new Array(A_QUESTIONS.length).fill(null);
+  aCurrent = 0;
+  renderAnchorQ();
+  goTo('screen-anchors-test');
+}
+function renderAnchorQ(){
+  const q=A_QUESTIONS[aCurrent];
+  document.getElementById('a-q-text').textContent=q.text;
+  document.getElementById('a-counter').textContent=`${aCurrent+1} / ${A_QUESTIONS.length}`;
+  document.getElementById('a-anchor-label').textContent=ANCHORS[q.anchor].name;
+  document.getElementById('a-progress').style.width=`${(aCurrent/A_QUESTIONS.length)*100}%`;
+
+  const scale=document.getElementById('a-scale');
+  scale.innerHTML=[1,2,3,4,5,6,7,8,9,10].map(n=>`
+    <button class="scale-btn ${aAnswers[aCurrent]===n?'selected':''}" onclick="anchorScore(${n})">${n}</button>`).join('');
+  document.getElementById('a-next-btn').disabled=aAnswers[aCurrent]===null;
+}
+function anchorScore(n){
+  aAnswers[aCurrent]=n;
+  document.querySelectorAll('#a-scale .scale-btn').forEach((b,i)=>{
+    b.classList.toggle('selected',i+1===n);
+  });
+  document.getElementById('a-next-btn').disabled=false;
+}
+function anchorNext(){
+  if(aAnswers[aCurrent]===null)return;
+  if(aCurrent<A_QUESTIONS.length-1){aCurrent++;renderAnchorQ();}
+  else showAnchorsResult();
+}
+function anchorPrev(){if(aCurrent>0){aCurrent--;renderAnchorQ();}}
+
+function showAnchorsResult(){
+  const sums=ANCHORS.map(()=>({sum:0,count:0}));
+  A_QUESTIONS.forEach((q,i)=>{
+    if(aAnswers[i]){sums[q.anchor].sum+=aAnswers[i];sums[q.anchor].count++;}
+  });
+  const avgs=sums.map((s,i)=>({name:ANCHORS[i].name,avg:s.count?s.sum/s.count:0,i}));
+  avgs.sort((a,b)=>b.avg-a.avg);
+  results.anchors=avgs;
+
+  const top3=avgs.slice(0,3);
+  document.getElementById('a-top-anchors').innerHTML=top3.map(a=>`
+    <div style="padding:6px 0;font-size:15px;font-weight:700">★ ${a.name} — ${a.avg.toFixed(1)}</div>`).join('');
+
+  document.getElementById('a-bars').innerHTML=avgs.map(a=>`
+    <div class="bar-item">
+      <div class="bar-label">${a.name}<span>${a.avg.toFixed(1)}</span></div>
+      <div class="bar-bg"><div class="bar-fill fill-anchor" style="width:${(a.avg/10)*100}%"></div></div>
+    </div>`).join('');
+
+  goTo('screen-anchors-result');
+  updateDashboard();
+}
+
+// ═══════════════════════════════════════════════════════════
+// VALUES
+// ═══════════════════════════════════════════════════════════
+function startValues(){goTo('screen-values-instr')}
+function startValuesTest(){
+  vScoresTerminal=new Array(18).fill(0);
+  vScoresInstr=new Array(18).fill(0);
+  vSection=0;
+  renderValuesSection();
+  goTo('screen-values-test');
+}
+function renderValuesSection(){
+  const isT=vSection===0;
+  const list=isT?VALUES_TERMINAL:VALUES_INSTRUMENTAL;
+  const scores=isT?vScoresTerminal:vScoresInstr;
+  document.getElementById('v-section-title').textContent=isT?'Мақсаттық құндылықтар':'Іс-жүзіндегі құндылықтар';
+  document.getElementById('v-section-desc').textContent=isT
+    ?'Өміріңізде не маңызды? Қандай мақсаттарға жетуді қалайсыз?'
+    :'Адам ретінде қандай қасиеттерді бойыңызда дамытқыңыз келеді?';
+  document.getElementById('v-next-btn').textContent=isT?'Келесі бөлім →':'Нәтижені көру →';
+  document.getElementById('v-back-btn').textContent=isT?'← Артқа':'← Алдыңғы бөлім';
+
+  document.getElementById('v-values-list').innerHTML=list.map((v,i)=>`
+    <div class="value-item" id="vi-${vSection}-${i}">
+      <div class="value-text">${v.text}<br><small style="color:var(--gray);font-weight:400">${v.cat}</small></div>
+      <div class="star-row" id="stars-${vSection}-${i}">
+        ${[1,2,3,4,5].map(s=>`<span class="star ${scores[i]>=s?'lit':''}" onclick="setValueScore(${i},${s})">★</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function setValueScore(idx,score){
+  const arr=vSection===0?vScoresTerminal:vScoresInstr;
+  arr[idx]=score;
+  const stars=document.querySelectorAll(`#stars-${vSection}-${idx} .star`);
+  stars.forEach((s,i)=>s.classList.toggle('lit',i<score));
+  document.getElementById(`vi-${vSection}-${idx}`).classList.toggle('selected-val',score>=3);
+}
+function valuesNext(){
+  if(vSection===0){vSection=1;renderValuesSection();window.scrollTo(0,0);}
+  else showValuesResult();
+}
+function valuesPrev(){
+  if(vSection===1){vSection=0;renderValuesSection();window.scrollTo(0,0);}
+  else goTo('screen-values-instr');
+}
+
+function showValuesResult(){
+  // Top terminal
+  const tSorted=[...VALUES_TERMINAL.map((v,i)=>({...v,score:vScoresTerminal[i]}))].sort((a,b)=>b.score-a.score);
+  const iSorted=[...VALUES_INSTRUMENTAL.map((v,i)=>({...v,score:vScoresInstr[i]}))].sort((a,b)=>b.score-a.score);
+  results.values={terminal:tSorted,instrumental:iSorted};
+
+  const top5=[...tSorted.slice(0,3),...iSorted.slice(0,2)];
+  document.getElementById('v-top-values').innerHTML=top5.map(v=>`
+    <div style="padding:5px 0;font-size:14px;font-weight:700">★ ${v.text}</div>`).join('');
+
+  // Category averages (terminal)
+  const cats={};
+  tSorted.forEach(v=>{
+    if(!cats[v.cat])cats[v.cat]={sum:0,count:0};
+    cats[v.cat].sum+=v.score;cats[v.cat].count++;
+  });
+  iSorted.forEach(v=>{
+    if(!cats[v.cat])cats[v.cat]={sum:0,count:0};
+    cats[v.cat].sum+=v.score;cats[v.cat].count++;
+  });
+  const catArr=Object.entries(cats).map(([k,v])=>({name:k,avg:v.sum/v.count})).sort((a,b)=>b.avg-a.avg);
+  document.getElementById('v-cat-bars').innerHTML=catArr.map(c=>`
+    <div class="bar-item">
+      <div class="bar-label">${c.name}<span>${c.avg.toFixed(1)}</span></div>
+      <div class="bar-bg"><div class="bar-fill fill-value" style="width:${(c.avg/5)*100}%"></div></div>
+    </div>`).join('');
+
+  goTo('screen-values-result');
+  updateDashboard();
+}
+
+// ═══════════════════════════════════════════════════════════
+// SUMMARY
+// ═══════════════════════════════════════════════════════════
+function showSummary(){
+  if(!results.holland||!results.anchors||!results.values)return;
+  const h=results.holland;
+  const a=results.anchors;
+  const v=results.values;
+
+  const hSorted=Object.entries(h).sort((x,y)=>y[1]-x[1]);
+  const hTop=hSorted.slice(0,2).map(([t])=>HOLLAND[t].name).join(' + ');
+  const aTop=a.slice(0,2).map(x=>x.name).join(', ');
+  const vTop=v.terminal.slice(0,2).map(x=>x.text).join(', ');
+
+  document.getElementById('summary-content').innerHTML=`
+    <div class="result-mini-card">
+      <h4>🧭 Холланд типі</h4>
+      <div style="font-size:20px;font-weight:800;color:var(--purple);margin-bottom:8px">${hTop}</div>
+      ${hSorted.map(([t,s])=>`
+        <div class="bar-item">
+          <div class="bar-label">${HOLLAND[t].name}<span>${s}/7</span></div>
+          <div class="bar-bg"><div class="bar-fill ${HOLLAND[t].fill}" style="width:${(s/7)*100}%"></div></div>
+        </div>`).join('')}
+    </div>
+    <div class="result-mini-card">
+      <h4>⚓ Мансап жетектері (Шейн)</h4>
+      <div style="font-size:16px;font-weight:700;color:var(--green);margin-bottom:8px">${aTop}</div>
+      ${a.map(x=>`
+        <div class="bar-item">
+          <div class="bar-label">${x.name}<span>${x.avg.toFixed(1)}</span></div>
+          <div class="bar-bg"><div class="bar-fill fill-anchor" style="width:${(x.avg/10)*100}%"></div></div>
+        </div>`).join('')}
+    </div>
+    <div class="result-mini-card">
+      <h4>💎 Ең жоғары құндылықтар (Рокич)</h4>
+      <div style="font-size:16px;font-weight:700;color:var(--orange);margin-bottom:12px">${vTop}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${[...v.terminal.slice(0,4),...v.instrumental.slice(0,3)].map(x=>`
+          <span style="background:var(--purple-bg);color:var(--purple);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600">${x.text}</span>`).join('')}
+      </div>
+    </div>
+    <div class="top-card" style="background:linear-gradient(135deg,var(--purple),var(--purple-light));margin-top:8px">
+      <h3>Ұсынылатын кәсіп бағыттары</h3>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:8px">
+        ${[...new Set(hSorted.slice(0,3).flatMap(([t])=>HOLLAND[t].careers))].slice(0,8)
+          .map(c=>`<div style="background:rgba(255,255,255,.2);border-radius:10px;padding:8px 16px;font-size:14px;font-weight:700">${c}</div>`).join('')}
+      </div>
+    </div>`;
+
+  goTo('screen-summary');
+}
+
+// Init
+updateDashboard();
+</script>
+</body>
+</html>
