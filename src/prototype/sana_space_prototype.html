@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Sana Space — прототип</title>
+<style>
+:root{
+  --bg:#0f1226; --card:#1a1f3d; --card2:#232a52; --ink:#f2f4ff; --muted:#9aa3d0;
+  --acc:#6c8cff; --acc2:#38d1b0; --warn:#ffb454; --danger:#ff6b81;
+  --grad:linear-gradient(135deg,#6c8cff 0%,#38d1b0 100%);
+  --r:18px; --sh:0 8px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent}
+body{background:var(--bg); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif; min-height:100vh}
+#app{max-width:520px; margin:0 auto; padding:16px 16px 90px}
+.topbar{display:flex; justify-content:space-between; align-items:center; padding:10px 2px 18px}
+.logo{font-weight:800; font-size:18px; letter-spacing:.3px}
+.logo span{background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+.langsw{display:flex; gap:6px}
+.langsw button{border:1px solid #333a6e; background:transparent; color:var(--muted); border-radius:10px; padding:6px 12px; font-weight:700; cursor:pointer; font-size:13px}
+.langsw button.on{background:var(--grad); color:#0b0e20; border-color:transparent}
+.card{background:var(--card); border-radius:var(--r); padding:22px; box-shadow:var(--sh); margin-bottom:14px}
+.card.soft{background:var(--card2)}
+h1{font-size:24px; line-height:1.25; margin-bottom:10px}
+h2{font-size:19px; margin-bottom:8px}
+p{line-height:1.5; color:var(--muted); font-size:15px}
+p.ink{color:var(--ink)}
+.btn{display:block; width:100%; border:none; border-radius:14px; padding:15px 18px; font-size:16px; font-weight:800; cursor:pointer; background:var(--grad); color:#0b0e20; margin-top:14px}
+.btn.ghost{background:transparent; border:1.5px solid #39407a; color:var(--ink); font-weight:600}
+.btn.mini{width:auto; padding:9px 14px; font-size:13px; display:inline-block; margin-top:8px}
+.btn:disabled{opacity:.4; cursor:default}
+.row{display:flex; gap:10px}
+.row .btn{flex:1}
+input[type=text],input[type=number],textarea,select{width:100%; background:#141936; border:1.5px solid #333a6e; color:var(--ink); border-radius:12px; padding:13px 14px; font-size:15px; margin-top:8px; font-family:inherit}
+textarea{min-height:88px; resize:vertical}
+label.f{display:block; margin-top:14px; font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+.chip{border:1.5px solid #333a6e; background:#141936; color:var(--ink); border-radius:999px; padding:9px 15px; font-size:14px; cursor:pointer; font-weight:600}
+.chip.on{background:var(--grad); color:#0b0e20; border-color:transparent}
+.scale{display:flex; gap:5px; margin-top:10px; flex-wrap:nowrap}
+.scale button{flex:1; aspect-ratio:1; min-width:0; border:1.5px solid #333a6e; background:#141936; color:var(--muted); border-radius:9px; font-weight:800; cursor:pointer; font-size:13px}
+.scale button.on{background:var(--grad); color:#0b0e20; border-color:transparent}
+.prog{height:7px; background:#232a52; border-radius:99px; overflow:hidden; margin:6px 0 16px}
+.prog i{display:block; height:100%; background:var(--grad); border-radius:99px; transition:width .3s}
+.daygrid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.day{background:var(--card); border-radius:16px; padding:16px; cursor:pointer; border:1.5px solid transparent; position:relative}
+.day.done{border-color:var(--acc2)}
+.day.lock{opacity:.45; cursor:default}
+.day .dn{font-size:11px; font-weight:800; color:var(--acc); text-transform:uppercase; letter-spacing:.5px}
+.day .dt{font-weight:800; margin-top:4px; font-size:15px}
+.day .ds{font-size:12px; color:var(--muted); margin-top:4px}
+.day .ok{position:absolute; top:10px; right:12px; color:var(--acc2); font-weight:900}
+.opt{display:block; width:100%; text-align:left; background:#141936; border:1.5px solid #333a6e; color:var(--ink); border-radius:14px; padding:15px; font-size:15px; line-height:1.4; cursor:pointer; margin-top:10px; font-family:inherit}
+.opt.on{border-color:var(--acc); background:#1b2350}
+.tag{display:inline-block; font-size:11px; font-weight:800; padding:4px 10px; border-radius:99px; background:#232a52; color:var(--acc); margin-bottom:8px; letter-spacing:.4px; text-transform:uppercase}
+.swipecard{background:var(--card2); border-radius:20px; padding:34px 22px; text-align:center; font-size:19px; font-weight:700; line-height:1.4; min-height:170px; display:flex; align-items:center; justify-content:center; box-shadow:var(--sh)}
+.swipebtns{display:flex; gap:10px; margin-top:16px}
+.swipebtns button{flex:1; border:none; border-radius:14px; padding:14px 6px; font-weight:800; font-size:14px; cursor:pointer}
+.sb-no{background:#3d2038; color:var(--danger)}
+.sb-mid{background:#232a52; color:var(--muted)}
+.sb-yes{background:#123f38; color:var(--acc2)}
+.profgrid{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:10px}
+.prof{border:1.5px solid #333a6e; background:#141936; border-radius:13px; padding:12px; font-size:13.5px; font-weight:600; cursor:pointer; text-align:center; color:var(--ink)}
+.prof.on{border-color:var(--danger); background:#33203a}
+.bar{margin-top:12px}
+.bar .bl{display:flex; justify-content:space-between; font-size:13.5px; font-weight:700; margin-bottom:4px}
+.bar .bt{height:9px; background:#232a52; border-radius:99px; overflow:hidden}
+.bar .bt i{display:block; height:100%; background:var(--grad); border-radius:99px}
+.note{font-size:12.5px; color:var(--muted); border-left:3px solid var(--warn); padding:8px 12px; background:#1d1c33; border-radius:0 10px 10px 0; margin-top:12px; line-height:1.45}
+.ai{display:flex; gap:10px; margin-top:14px}
+.ai .av{width:34px; height:34px; border-radius:50%; background:var(--grad); flex:none; display:flex; align-items:center; justify-content:center; font-weight:900; color:#0b0e20; font-size:13px}
+.ai .bub{background:var(--card2); border-radius:4px 16px 16px 16px; padding:13px 15px; font-size:15px; line-height:1.5}
+.me{background:#1b2350; border-radius:16px 4px 16px 16px; padding:13px 15px; font-size:15px; line-height:1.5; margin:12px 0 0 44px}
+.footer{position:fixed; bottom:0; left:0; right:0; text-align:center; padding:10px; font-size:11px; color:#5a6296; background:linear-gradient(transparent,var(--bg) 40%)}
+.center{text-align:center}
+.big{font-size:42px; margin:10px 0}
+.report h3{margin:18px 0 6px; font-size:16px; color:var(--acc)}
+.report .sec{background:var(--card2); border-radius:14px; padding:16px; margin-top:10px}
+.report p{font-size:14px; margin-top:6px}
+.pill{display:inline-block; background:#232a52; border-radius:99px; padding:5px 12px; font-size:12.5px; font-weight:700; margin:4px 4px 0 0; color:var(--ink)}
+.micbtn{width:auto; padding:8px 14px; font-size:13px; margin-top:8px; display:inline-block; background:transparent; border:1.5px solid #39407a; color:var(--muted); border-radius:99px; font-weight:700; cursor:pointer}
+.micbtn.rec{border-color:var(--danger); color:var(--danger); animation:recpulse 1.2s infinite}
+@keyframes recpulse{0%,100%{opacity:1}50%{opacity:.55}}
+.demo{position:fixed; bottom:34px; right:14px; background:#232a52; color:var(--warn); border:1px solid #3a3560; border-radius:99px; padding:8px 14px; font-size:12px; font-weight:800; cursor:pointer; z-index:5}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="footer" id="foot"></div>
+<script>
+
+
+"use strict";
+/* ─── ПОДКЛЮЧЕНИЕ (настройка — см. Настройка_автосбора_и_ИИ.md) ─── */
+const CONFIG = {
+  RESULTS_URL: "https://script.google.com/macros/s/AKfycbyQrCVzWgvQEkfz8jUso22TAHOV2mEQvGhtAncpTtXja-_CWdNqUl0VGv4ayEg5X7ehxA/exec",
+  AI_URL: "/api/chat"     // живой ИИ: заработает автоматически после настройки Netlify Function
+};
+let aiOff=false;          // авто-откл. ИИ, если сервер недоступен
+/* ============================================================
+   SANA SPACE — интерактивный прототип пути подростка (v0.9)
+   Весь контент — уникальная база Sana Space (Сессии 1–3).
+   Казахские тексты — черновик до вычитки носителем.
+   ============================================================ */
+
+/* ---------- UI-строки ---------- */
+const UI = {
+  appname:{r:"Sana Space", k:"Sana Space"},
+  tagline:{r:"Твоя карта профессий за 7 дней", k:"7 күнде — сенің мамандық картаң"},
+  start:{r:"Начать путешествие", k:"Саяхатты бастау"},
+  cont:{r:"Продолжить", k:"Жалғастыру"},
+  next:{r:"Дальше", k:"Әрі қарай"},
+  done:{r:"Готово", k:"Дайын"},
+  home:{r:"К карте дней", k:"Күндер картасына"},
+  day:{r:"День", k:"Күн"},
+  of:{r:"из", k:"/"},
+  answer_ph:{r:"Напиши свой ответ… (в полной версии можно наговорить голосом)", k:"Жауабыңды жаз… (толық нұсқада дауыспен айтуға болады)"},
+  skip:{r:"Пропустить", k:"Өткізіп жіберу"},
+  like:{r:"Нравится", k:"Ұнайды"},
+  mid:{r:"Всё равно", k:"Бәрібір"},
+  dislike:{r:"Не нравится", k:"Ұнамайды"},
+  demo_fill:{r:"⚡ Демо: заполнить день", k:"⚡ Демо: күнді толтыру"},
+  locked:{r:"Откроется после предыдущего дня", k:"Алдыңғы күннен кейін ашылады"},
+  report_btn:{r:"Черновик отчета (режим консультанта)", k:"Есеп жобасы (кеңесші режимі)"},
+  onb_title:{r:"Давай познакомимся", k:"Танысайық"},
+  onb_name:{r:"Как тебя зовут?", k:"Атың кім?"},
+  onb_age:{r:"Сколько тебе лет?", k:"Жасың нешеде?"},
+  onb_city:{r:"Твой город", k:"Қалаң"},
+  onb_track:{r:"Где ты планируешь учиться после школы?", k:"Мектептен кейін қайда оқуды жоспарлайсың?"},
+  tr_kz:{r:"В Казахстане", k:"Қазақстанда"},
+  tr_ab:{r:"За рубежом", k:"Шетелде"},
+  tr_both:{r:"Рассматриваю оба варианта", k:"Екі нұсқаны да қарастырамын"},
+  tr_und:{r:"Пока не знаю", k:"Әзірше білмеймін"},
+  onb_vol:{r:"Ты сам(а) решил(а) пройти программу?", k:"Бағдарламадан өтуді өзің шештің бе?"},
+  vol_yes:{r:"Да, это мой выбор", k:"Иә, бұл — өз таңдауым"},
+  vol_no:{r:"Меня записали родители/школа", k:"Мені ата-анам/мектеп жазды"},
+  vol_msg:{r:"Понимаю. Иногда просто приходит время выбирать — и кто-то пытается помочь. Дай этой программе шанс: тут не школа, тут всё — про тебя. Получится включиться — будет результат, важный для тебя.", k:"Түсінемін. Кейде таңдау уақыты жай ғана келеді — және біреу көмектескісі келеді. Осы бағдарламаға мүмкіндік бер: бұл мектеп емес, мұнда бәрі — сен туралы. Қосыла алсаң — өзіңе маңызды нәтиже болады."},
+  contract:{r:"Мой договор с собой: я отвечаю честно — не «как надо», а как есть. Мои ответы — основа моей карты профессий.", k:"Өзіммен келісімім: мен адал жауап беремін — «қалай керек» емес, қалай бар солай. Менің жауаптарым — мамандық картамның негізі."},
+  contract_ok:{r:"Принимаю ✋", k:"Қабылдаймын ✋"},
+  kz_draft:{r:"Прототип v0.7 · казахская версия вычитана · автосбор включен", k:"Прототип v0.7 · қазақшасы тексерілді · автожинау қосулы"},
+  synth_wait:{r:"Спасибо за эту неделю! Ты рассказал(а) о себе очень много важного. Сейчас всё это уходит эксперту — твой отчет будет готов в ближайшие дни.", k:"Осы апта үшін рахмет! Сен өзің туралы көп маңызды нәрсе айттың. Енді бәрі сарапшыға жіберіледі — есебің жақын күндері дайын болады."},
+};
+
+/* ---------- Дни программы ---------- */
+const DAYS = [
+  {id:1, icon:"🎪", title:{r:"30 дней до фестиваля", k:"Фестивальге дейін 30 күн"}, sub:{r:"Игра-квест", k:"Ойын-квест"}},
+  {id:2, icon:"🔍", title:{r:"ЛУПа", k:"ЛУПа"}, sub:{r:"Что ты любишь", k:"Нені жақсы көресің"}},
+  {id:3, icon:"🎙️", title:{r:"Твоя история", k:"Сенің хикаяң"}, sub:{r:"Интервью", k:"Сұхбат"}},
+  {id:4, icon:"🧭", title:{r:"Карта векторов", k:"Векторлар картасы"}, sub:{r:"Свайпы + антирейтинг", k:"Свайптар + антирейтинг"}},
+  {id:5, icon:"💎", title:{r:"Что для тебя важно", k:"Сен үшін не маңызды"}, sub:{r:"Ценности и якоря", k:"Құндылықтар мен якорьлар"}},
+  {id:6, icon:"🌀", title:{r:"Мультивселенная", k:"Мультиғалам"}, sub:{r:"7 порталов", k:"7 портал"}},
+  {id:7, icon:"🐋", title:{r:"Три кита и деньги", k:"Үш кит және ақша"}, sub:{r:"Смысл + ожидания", k:"Мағына + күтулер"}},
+  {id:8, icon:"✨", title:{r:"Синтез", k:"Синтез"}, sub:{r:"Собираем картину", k:"Бейнені құрастырамыз"}},
+];
+
+/* ---------- Состояние ---------- */
+let S = load() || {
+  lang:"ru", screen:"welcome", profile:{}, doneDays:[], cur:null,
+  res:{ game:{pattern:[], open:{}, }, lupa:{subjects:{},activities:{},probes:{}}, narrative:{},
+        riasec:{}, anti:{picks:[],reasons:{}}, values:{}, schein:{}, scen:{}, whales:{}, money:{}, synth:{} }
+};
+function save(){ try{ localStorage.setItem("sana_proto", JSON.stringify(S)); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem("sana_proto")); }catch(e){ return null; } }
+function T(o){ return o[S.lang==="kz"?"k":"r"]; }
+function t(key){ return T(UI[key]); }
+function el(html){ const d=document.createElement("div"); d.innerHTML=html; return d; }
+function app(){ return document.getElementById("app"); }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+
+/* ---------- Каркас ---------- */
+function topbar(){
+  return `<div class="topbar">
+    <div class="logo"><span>Sana</span> Space</div>
+    <div class="langsw">
+      <button class="${S.lang==='ru'?'on':''}" onclick="setLang('ru')">РУС</button>
+      <button class="${S.lang==='kz'?'on':''}" onclick="setLang('kz')">ҚАЗ</button>
+    </div></div>`;
+}
+function setLang(l){ S.lang=l; save(); render(); }
+function go(screen){ S.screen=screen; save(); window.scrollTo(0,0); render(); }
+function render(){
+  document.getElementById("foot").textContent = t("kz_draft");
+  const scr = SCREENS[S.screen] || SCREENS.welcome;
+  app().innerHTML = topbar();
+  scr();
+  addMics();
+  save();
+}
+/* ─── Голосовой ввод (Web Speech API, бесплатно, работает не во всех браузерах) ─── */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recAct = null;
+function addMics(){
+  if(!SR) return;
+  document.querySelectorAll("textarea").forEach(ta=>{
+    if(ta.dataset.mic) return; ta.dataset.mic="1";
+    const b=document.createElement("button");
+    b.type="button"; b.className="micbtn";
+    b.textContent="🎤 "+(S.lang==='kz'?"Дауыспен айту":"Наговорить голосом");
+    b.onclick=(e)=>{ e.preventDefault(); toggleDict(ta,b); };
+    ta.insertAdjacentElement("afterend", b);
+  });
+}
+function toggleDict(ta,b){
+  if(recAct){ try{recAct.stop();}catch(e){} return; }
+  let r; try{ r=new SR(); }catch(e){ b.style.display="none"; return; }
+  r.lang = S.lang==='kz' ? 'kk-KZ' : 'ru-RU';
+  r.interimResults=false; r.continuous=true; r.maxAlternatives=1;
+  recAct=r;
+  b.classList.add("rec");
+  b.textContent="⏹ "+(S.lang==='kz'?"Тоқтату (жазылуда…)":"Стоп (запись идет…)");
+  r.onresult=(e)=>{
+    let txt="";
+    for(let i=e.resultIndex;i<e.results.length;i++) txt+=e.results[i][0].transcript+" ";
+    ta.value=(ta.value+" "+txt).replace(/\s+/g," ").trim();
+  };
+  r.onerror=()=>{ try{r.stop();}catch(e){} };
+  r.onend=()=>{
+    recAct=null; b.classList.remove("rec");
+    b.textContent="🎤 "+(S.lang==='kz'?"Дауыспен айту":"Наговорить голосом");
+  };
+  try{ r.start(); }catch(e){ recAct=null; }
+}
+
+/* ---------- Экраны: приветствие и онбординг ---------- */
+const SCREENS = {};
+
+SCREENS.welcome = function(){
+  app().insertAdjacentHTML("beforeend", `
+    <div class="card center">
+      <div class="big">🧭</div>
+      <h1>${t("tagline")}</h1>
+      <p>${S.lang==='kz'
+        ? "Бұл тест емес — бұл сен туралы 7 күндік зерттеу. Ойын, сұхбаттар және ашылулар. Соңында сарапшы саған жеке есеп дайындайды."
+        : "Это не тест — это 7-дневное исследование о тебе. Игра, интервью и открытия. В конце эксперт подготовит твой личный отчет."}</p>
+      <button class="btn" onclick="go('onboard')">${t("start")}</button>
+      ${S.doneDays.length? `<button class="btn ghost" onclick="go('home')">${t("cont")}</button>`:""}
+    </div>`);
+};
+
+SCREENS.onboard = function(){
+  const p = S.profile;
+  app().insertAdjacentHTML("beforeend", `
+    <div class="card">
+      <h2>${t("onb_title")}</h2>
+      <label class="f">${t("onb_name")}</label><input type="text" id="o_name" value="${p.name||""}">
+      <label class="f">${t("onb_age")}</label><input type="number" id="o_age" min="12" max="19" value="${p.age||""}">
+      <label class="f">${t("onb_city")}</label><input type="text" id="o_city" value="${p.city||""}">
+      <label class="f">${t("onb_track")}</label>
+      <div class="chips" id="o_track">
+        ${[["kz",t("tr_kz")],["abroad",t("tr_ab")],["both",t("tr_both")],["undecided",t("tr_und")]]
+          .map(x=>`<div class="chip ${p.track===x[0]?'on':''}" onclick="pickTrack('${x[0]}')">${x[1]}</div>`).join("")}
+      </div>
+      <label class="f">${t("onb_vol")}</label>
+      <div class="chips">
+        <div class="chip ${p.voluntary===true?'on':''}" onclick="pickVol(true)">${t("vol_yes")}</div>
+        <div class="chip ${p.voluntary===false?'on':''}" onclick="pickVol(false)">${t("vol_no")}</div>
+      </div>
+      ${p.voluntary===false? `<div class="note">${t("vol_msg")}</div>`:""}
+      <div class="note">${S.lang==='kz'?"Толық нұсқада: ата-ананың келісімі және құпиялылық туралы келісім. Сенің ИИ-мен чатың — жеке кеңістік, оны ата-ана да, мектеп те көрмейді.":"В полной версии здесь: согласие родителя и соглашение о конфиденциальности. Твой чат с ИИ — личное пространство: его не видят ни родители, ни школа."}</div>
+      <div class="card soft" style="margin-top:14px"><p class="ink">${t("contract")}</p></div>
+      <button class="btn" onclick="finishOnboard()">${t("contract_ok")}</button>
+    </div>`);
+};
+function readOnboard(){
+  const n=document.getElementById("o_name"), a=document.getElementById("o_age"), c=document.getElementById("o_city");
+  if(n) S.profile.name=n.value;
+  if(a) S.profile.age=a.value;
+  if(c) S.profile.city=c.value;
+}
+function pickTrack(v){ readOnboard(); S.profile.track=v; save(); render(); }
+function pickVol(v){ readOnboard(); S.profile.voluntary=v; save(); render(); }
+function finishOnboard(){
+  readOnboard();
+  if(!S.profile.track) S.profile.track="undecided";
+  save(); go("home");
+}
+
+/* ---------- Карта дней ---------- */
+SCREENS.home = function(){
+  const name = S.profile.name? (", "+S.profile.name):"";
+  const doneCount = S.doneDays.length;
+  if(doneCount===8 && CONFIG.RESULTS_URL && !S.sentOk && sendState!=="sending") setTimeout(maybeSendResults,300);
+  app().insertAdjacentHTML("beforeend", `
+    <div class="card soft">
+      <h2>${S.lang==='kz'? "Сәлем"+name+"!" : "Привет"+name+"!"}</h2>
+      <p>${S.lang==='kz'? `Өткені: ${doneCount} / 8 күн` : `Пройдено: ${doneCount} из 8 дней`}</p>
+      <div class="prog"><i style="width:${doneCount/8*100}%"></i></div>
+      <div class="daygrid">
+        ${DAYS.map(d=>{
+          const done = S.doneDays.includes(d.id);
+          const locked = d.id>1 && !S.doneDays.includes(d.id-1) && !done;
+          return `<div class="day ${done?'done':''} ${locked?'lock':''}" onclick="${locked?'':'openDay('+d.id+')'}">
+            ${done?'<span class="ok">✓</span>':''}
+            <div class="dn">${t("day")} ${d.id}</div>
+            <div class="dt">${d.icon} ${T(d.title)}</div>
+            <div class="ds">${locked? t("locked") : T(d.sub)}</div>
+          </div>`;
+        }).join("")}
+      </div>
+      ${doneCount===8 && CONFIG.RESULTS_URL? `<p style="font-size:12.5px;margin-top:10px">${S.sentOk||sendState==="ok"? (S.lang==='kz'?"✅ Нәтижелер тәлімгерге жіберілді":"✅ Результаты отправлены наставнику") : sendState==="err"? (S.lang==='kz'?"⚠️ Жіберілмеді — файлды жүктеп ал":"⚠️ Не отправилось — скачай файл") : (S.lang==='kz'?"⏳ Нәтижелерді жіберудеміз…":"⏳ Отправляю результаты…")}</p>`:""}
+      ${doneCount===8? `<button class="btn ghost" onclick="exportResults()">📤 ${S.lang==='kz'?'Нәтижелерді жүктеу':'Скачать результаты'}</button><button class="btn" onclick="go('report')">${t("report_btn")}</button>`:""}
+    </div>
+    ${DEMO_MODE? `<div class="demo" onclick="demoAll()">⚡ ${S.lang==='kz'?'Демо: бәрін толтыру':'Демо: пройти всё'}</div>`:""}`);
+};
+function openDay(id){ S.cur=id; go("day"+id); }
+function completeDay(id){ if(!S.doneDays.includes(id)) S.doneDays.push(id); go("home"); }
+
+/* Заглушки дней — заменяются модулями ниже */
+for(let i=1;i<=8;i++){ SCREENS["day"+i] = (function(n){ return function(){
+  app().insertAdjacentHTML("beforeend", `<div class="card"><h2>${t("day")} ${n}</h2><p>Модуль в сборке…</p><button class="btn" onclick="completeDay(${n})">${t("done")}</button></div>`);
+};})(i); }
+
+/* Кнопка "Демо: пройти всё" — только для показов школам/инвесторам.
+   Скрыта от обычных пользователей, чтобы её случайно не нажали и не затёрли
+   реальное имя/ответы тестовым профилем "Демо Айым". Включается ссылкой ?demo=1. */
+const DEMO_MODE = new URLSearchParams(location.search).get("demo")==="1";
+/* Демо-заполнение всего пути (для показов школам/инвесторам) */
+function demoAll(){
+  S.profile={name:"Демо Айым",age:15,city:"Алматы",track:"both",voluntary:true};
+  S.isDemo=true;
+  S.sentOk=false; sendState="";
+  DEMO_FILLERS.forEach(f=>f()); S.doneDays=[1,2,3,4,5,6,7,8]; save(); go("home");
+}
+const DEMO_FILLERS = [];
+function exportData(){
+  return {app:"sana_space_prototype", exported:new Date().toISOString(), isDemo:!!S.isDemo,
+    profile:S.profile, doneDays:S.doneDays, res:S.res,
+    scores:{riasec:riasecScores(), mcclelland:mccScores(), schein:schScores(), values:valScores()}};
+}
+let sendState="";
+async function maybeSendResults(){
+  if(!CONFIG.RESULTS_URL || S.sentOk || sendState==="sending") return;
+  sendState="sending"; render();
+  try{
+    await fetch(CONFIG.RESULTS_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain"},body:JSON.stringify(exportData())});
+    S.sentOk=true; sendState="ok"; save();
+  }catch(e){ sendState="err"; }
+  render();
+}
+async function aiAsk(messages){
+  if(!CONFIG.AI_URL || aiOff) return "";
+  try{
+    const ctrl=new AbortController(); const tm=setTimeout(()=>ctrl.abort(),20000);
+    const r=await fetch(CONFIG.AI_URL,{method:"POST",signal:ctrl.signal,
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({mode:"day3",lang:S.lang,messages})});
+    clearTimeout(tm);
+    if(!r.ok){ aiOff=true; return ""; }
+    const d=await r.json(); return (d.text||"").trim();
+  }catch(e){ aiOff=true; return ""; }
+}
+function exportResults(){
+  const data=exportData();
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="sana_"+((S.profile.name||"user").replace(/\s+/g,"_"))+".json"; a.click();
+}
+
+/* ============ ДЕНЬ 1. Игра «30 дней до фестиваля» ============ */
+const GAME = {
+  intro:{r:"Твой город выиграл национальный грант на большой молодежный фестиваль: музыка, технологии, спорт, искусство — вход свободный для всех. Организует его команда молодых волонтеров, и тебя позвали в ядро команды. Денег за это не платят никому — все делают это ради самого фестиваля. Опыт не важен: рядом наставники, которые научат чему угодно. Важно одно — как ты будешь действовать. До фестиваля 30 дней. Поехали!",
+        k:"Сенің қалаң үлкен жастар фестиваліне ұлттық грант ұтып алды: музыка, технологиялар, спорт, өнер — бәрі бір жерде, кіру бәріне тегін. Оны әкімдік емес, жас волонтерлер командасы ұйымдастырады. Сені команданың ядросына шақырды. Бұл үшін ешкімге ақы төленбейді — бәрі мұны фестивальдің өзі үшін жасайды. Тәжірибе маңызды емес: қасыңда кез келген нәрсеге үйрететін тәлімгерлер бар. Маңыздысы біреу — сенің қалай әрекет ететінің. Фестивальге дейін 30 күн. Кеттік!"},
+  scenes:[
+    {d:1, q:{r:"Первая встреча команды. Организатор спрашивает: «С чего начнешь в первую неделю?»", k:"Команданың алғашқы жиыны. Ұйымдастырушы сұрайды: «Бірінші аптаны неден бастайсың?»"},
+     o:[{t:"P",r:"Составлю общий план и распределю, кто за что отвечает",k:"Жалпы жоспар құрып, кім не үшін жауап беретінін бөлемін"},
+        {t:"A",r:"Перезнакомлю всех, создам чат и общее настроение — без команды ничего не будет",k:"Бәрін таныстырып, чат ашып, ортақ көңіл-күй жасаймын — командасыз ештеңе болмайды"},
+        {t:"D",r:"Возьму самую сложную задачу — ту, за которую боятся браться остальные",k:"Ең қиын міндетті аламын — басқалар қорқып жүрген істі"}]},
+    {d:4, q:{r:"Фестивалю нужна главная идея — то, чем он запомнится. Твой ход?", k:"Фестивальге басты идея керек — есте қалатын нәрсе. Сенің қадамың?"},
+     o:[{t:"P",r:"У меня уже есть идея. Подготовлюсь и убежу команду, что она сильнейшая",k:"Менде идея бар. Дайындалып, команданы оның ең мықты екеніне сендіремін"},
+        {t:"A",r:"Соберу мозговой штурм: идея, рожденная вместе, объединит всех",k:"Миға шабуыл ұйымдастырамын: бірге туған идея бәрімізді біріктіреді"},
+        {t:"D",r:"Изучу лучшие фестивали мира и придумаю то, чего еще никто не делал",k:"Әлемнің үздік фестивальдерін зерттеп, ешкім жасамағанды ойлап табамын"}]},
+    {d:12, open:true, q:{r:"Катастрофа: площадка фестиваля отказала за две недели до события. Команда в панике. Что делаешь первым делом?", k:"Апат: фестиваль алаңы іс-шараға екі апта қалғанда бас тартты. Команда дүрлігіп жатыр. Ең бірінші не істейсің?"},
+     o:[{t:"P",r:"Беру переговоры на себя: сегодня же найду новую площадку и передоговорюсь со всеми",k:"Келіссөзді өзім аламын: бүгін-ақ жаңа алаң тауып, бәрімен қайта келісемін"},
+        {t:"A",r:"Сначала — команда: соберу всех, успокою и верну веру. Паника опаснее проблемы",k:"Алдымен — команда: бәрін жинап, тыныштандырып, сенімді қайтарамын. Дүрбелең мәселенің өзінен қауіпті"},
+        {t:"D",r:"А это интересная задача: а если формат, которому площадка вообще не нужна?",k:"Мынау қызық есеп қой: алаң мүлдем керек емес формат ойлап тапсақ ше?"}],
+     probe:{r:"Расскажи, почему именно так? Что было бы для тебя самым трудным в двух других вариантах?", k:"Неге дәл осылай? Қалған екі нұсқада сен үшін ең қиыны не болар еді?"}},
+    {d:15, q:{r:"Два ключевых человека команды поссорились и отказываются работать вместе. Твое решение?", k:"Команданың екі негізгі адамы ренжісіп, бірге жұмыс істеуден бас тартты. Сенің шешімің?"},
+     o:[{t:"P",r:"Разведу их по разным зонам и перераспределю задачи — дело важнее ссор",k:"Оларды әр аймаққа бөліп, міндеттерді қайта бөлемін — іс ренжістен маңызды"},
+        {t:"A",r:"Поговорю с каждым наедине: пойму обоих, потом помогу им услышать друг друга",k:"Әрқайсысымен жеке сөйлесемін: екеуін де түсініп, бір-бірін естуге көмектесемін"},
+        {t:"D",r:"Дам им одну задачу, которую невозможно решить поодиночке, — пусть дело помирит",k:"Жалғыз шешу мүмкін емес ортақ міндет беремін — іс өзі татуластырсын"}]},
+    {d:20, q:{r:"Три зоны фестиваля просят тебя к себе. Куда пойдешь?", k:"Фестивальдің үш аймағы сені өзіне шақырып жатыр. Қайда барасың?"},
+     o:[{t:"P",r:"Штаб: координировать сто волонтеров, чтобы все работало как часы",k:"Штаб: жүз волонтердің жұмысын сағат тіліндей үйлестіру"},
+        {t:"A",r:"Зона гостей: встречать артистов и посетителей, быть лицом фестиваля",k:"Қонақтар аймағы: әртістер мен келушілерді қарсы алу, фестивальдің жүзі болу"},
+        {t:"D",r:"Главная сцена: проектировать свет и звук с инженерами — так еще никто не делал",k:"Бас сахна: инженерлермен бірге жарық пен дыбысты жобалау — бұлай әлі ешкім жасамаған"}]},
+    {d:25, q:{r:"Городской журналист берет у тебя интервью. О чем расскажешь с самым большим удовольствием?", k:"Қала журналисі сенен сұхбат алып жатыр. Нені баса қуанып айтасың?"},
+     o:[{t:"P",r:"Как удалось организовать сотню людей и не сорвать ни одного срока",k:"Жүз адамды ұйымдастырып, бірде-бір мерзімді өткізіп алмағанымызды"},
+        {t:"A",r:"Про команду, которая за месяц стала почти семьей",k:"Бір айда отбасыдай болып кеткен команданы"},
+        {t:"D",r:"Про решения, которых не было еще ни на одном фестивале страны",k:"Елдің бірде-бір фестивалінде болмаған шешімдерді"}]},
+    {d:29, q:{r:"На генеральной репетиции все идет не так. Что задевает тебя больнее всего?", k:"Бас репетицияда бәрі керісінше кетті. Сені ең қатты не жаралайды?"},
+     o:[{t:"P",r:"Хаос: никто никого не слушает, каждый делает свое",k:"Бейберекет: ешкім ешкімді тыңдамайды, әркім өзінікін істеп жүр"},
+        {t:"A",r:"Все переругались, от атмосферы месяца ничего не осталось",k:"Бәрі ұрсысып қалды, бір айғы жылы атмосферадан түк қалмады"},
+        {t:"D",r:"Наша главная фишка — то, чем мы хотели удивить, — не сработала",k:"Біздің басты «фишкамыз» — таңғалдырғымыз келген нәрсе — іске аспады"}]},
+    {d:31, open:true, w:2, q:{r:"Фестиваль прошел. Ночью ты листаешь фотографии. Какой момент — самый теплый?", k:"Фестиваль өтті. Түнде суреттерді қарап отырсың. Ең жылы сәт қайсысы?"},
+     o:[{t:"P",r:"Момент, когда сто человек работали слаженно — и ты видел(а), что это держится на твоих решениях",k:"Жүз адам ұйымдасып жұмыс істеген сәт — және мұның сенің шешімдеріңе сүйеніп тұрғанын көргенің"},
+        {t:"A",r:"Объятия команды после финала и слова: «без тебя бы не получилось»",k:"Финалдан кейінгі команданың құшағы және «сенсіз болмас еді» деген сөздер"},
+        {t:"D",r:"Секунда, когда сработала идея, которую все называли невозможной",k:"Бәрі «мүмкін емес» деген идеяның іске асқан секунды"}],
+     probe:{r:"А теперь без вариантов, своими словами: что этот месяц дал тебе такого, ради чего ты согласился бы на следующий фестиваль?", k:"Енді нұсқасыз, өз сөзіңмен: осы ай саған келесі фестивальге келісетіндей не берді?"}}
+  ]
+};
+
+let g_i = -1, g_probe = false;
+SCREENS.day1 = function(){
+  if(g_i === -1){
+    app().insertAdjacentHTML("beforeend", `
+      <div class="card"><div class="tag">${t("day")} 1 · ${S.lang==='kz'?'Ойын':'Игра'}</div>
+      <h1>🎪 ${T(DAYS[0].title)}</h1><p>${T(GAME.intro)}</p>
+      <button class="btn" onclick="g_i=0;render()">${S.lang==='kz'?'Кеттік!':'Поехали!'}</button></div>`);
+    return;
+  }
+  if(g_i >= GAME.scenes.length){
+    app().insertAdjacentHTML("beforeend", `
+      <div class="card center"><div class="big">🏅</div>
+      <h2>${S.lang==='kz'?'Фестиваль өтті!':'Фестиваль состоялся!'}</h2>
+      <p>${S.lang==='kz'?'Сенің шешімдерің қазірдің өзінде маңызды нәрсені айтып берді. Ертең — ЛУПа: нені жақсы көретініңді білеміз.':'Твои решения уже рассказали кое-что важное. Завтра — ЛУПа: узнаем, что ты любишь.'}</p>
+      <button class="btn" onclick="g_i=-1;completeDay(1)">${t("home")}</button></div>`);
+    return;
+  }
+  const sc = GAME.scenes[g_i];
+  const picked = S.res.game.pattern[g_i];
+  if(g_probe && sc.probe){
+    const chosenOpt = sc.o.find(o=>o.t===picked);
+    app().insertAdjacentHTML("beforeend", `
+      <div class="card"><div class="tag">${S.lang==='kz'?'Тәлімгер':'Наставник'}</div>
+      <div class="ai"><div class="av">S</div><div class="bub">${chosenOpt? (S.lang==='kz'?'Сен таңдадың':'Ты выбрал(а)')+": «"+T(chosenOpt)+"». ":""}${T(sc.probe)}</div></div>
+      <textarea id="g_open" placeholder="${t('answer_ph')}">${S.res.game.open[g_i]||""}</textarea>
+      <button class="btn" onclick="gProbeDone()">${t("next")}</button></div>`);
+    return;
+  }
+  const opts = sc._sh || (sc._sh = shuffle(sc.o));
+  app().insertAdjacentHTML("beforeend", `
+    <div class="card"><div class="tag">${sc.d>30? (S.lang==='kz'?'Фестивальден кейінгі түн':'Ночь после фестиваля') : (S.lang==='kz'?'Күн':'День')+" "+sc.d+" / 30"}</div>
+    <div class="prog"><i style="width:${(g_i)/GAME.scenes.length*100}%"></i></div>
+    <h2>${T(sc.q)}</h2>
+    ${opts.map((o,idx)=>`<button class="opt ${picked===o.t?'on':''}" onclick="gPick(${g_i},'${o.t}')">${T(o)}</button>`).join("")}
+    </div>`);
+};
+function gPick(i, tag){
+  S.res.game.pattern[i]=tag; save();
+  const sc = GAME.scenes[i];
+  if(sc.probe){ g_probe=true; render(); }
+  else { g_i++; render(); }
+}
+function gProbeDone(){
+  S.res.game.open[g_i] = document.getElementById("g_open").value||"";
+  g_probe=false; g_i++; save(); render();
+}
+DEMO_FILLERS.push(function(){
+  S.res.game.pattern=["D","D","D","A","D","P","D","A"];
+  S.res.game.open={2:"Мне интереснее придумать формат, которого не было — задача сложная, но такие меня заводят.",7:"Этот месяц дал ощущение, что я могу создать то, что считали невозможным."};
+});
+
+/* ============ ДЕНЬ 2. ЛУПа ============ */
+const LUPA = {
+  subjects:[
+    {id:"math",r:"Математика",k:"Математика"},{id:"inf",r:"Информатика",k:"Информатика"},
+    {id:"lang",r:"Иностранные языки",k:"Шет тілдері"},{id:"hist",r:"История",k:"Тарих"},
+    {id:"soc",r:"Обществознание",k:"Қоғамтану"},{id:"rus",r:"Русский / казахский язык",k:"Қазақ / орыс тілі"},
+    {id:"lit",r:"Литература",k:"Әдебиет"},{id:"bio",r:"Биология",k:"Биология"},
+    {id:"phys",r:"Физика",k:"Физика"},{id:"chem",r:"Химия",k:"Химия"},
+    {id:"geom",r:"Геометрия",k:"Геометрия"},{id:"art",r:"Черчение, ИЗО",k:"Сызу, бейнелеу өнері"},
+    {id:"pe",r:"Физкультура",k:"Дене шынықтыру"},{id:"tech",r:"Труды / технология",k:"Еңбек / технология"}
+  ],
+  activities:[
+    {id:"talk",r:"Общаться с людьми",k:"Адамдармен араласу"},{id:"teach",r:"Обучать других",k:"Басқаларды оқыту"},
+    {id:"help",r:"Помогать другим людям",k:"Басқа адамдарға көмектесу"},{id:"lead",r:"Руководить и организовывать",k:"Басқару және ұйымдастыру"},
+    {id:"research",r:"Изучать и исследовать что-либо",k:"Бір нәрсені зерттеу"},{id:"solve",r:"Решать сложные интеллектуальные задачи",k:"Күрделі зияткерлік есептер шешу"},
+    {id:"fix",r:"Ремонтировать и чинить что-то",k:"Бір нәрсені жөндеу"},{id:"draw",r:"Рисовать",k:"Сурет салу"},
+    {id:"video",r:"Фотографировать, снимать видео",k:"Суретке түсіру, видео түсіру"},{id:"code",r:"Программировать",k:"Бағдарламалау"},
+    {id:"fun",r:"Развлекать и смешить других",k:"Басқаларды көңілдендіру, күлдіру"},{id:"write",r:"Писать тексты",k:"Мәтін жазу"},
+    {id:"build",r:"Конструировать, разбираться в механизмах",k:"Құрастыру, механизмдерді түсіну"},{id:"heal",r:"Лечить людей или животных",k:"Адамдарды немесе жануарларды емдеу"},
+    {id:"cult",r:"Изучать языки и культуры других стран",k:"Басқа елдердің тілдері мен мәдениетін зерттеу"}
+  ],
+  probeQ:{r:"— интересная оценка! Расскажи, почему именно так?", k:"— қызық баға! Неге дәл солай, айтып берші?"}
+};
+let l_stage = 0; // 0 intro, 1 subjects, 2 activities, 3 probes, 4 done
+SCREENS.day2 = function(){
+  const R = S.res.lupa;
+  if(l_stage===0){
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${t("day")} 2</div>
+      <h1>🔍 ЛУПа</h1>
+      <p>${S.lang==='kz'?"Әр пәнге және іске 1-ден 10-ға дейін баға қой: 1 — «мүлдем ұнамайды», 10 — «өте жақсы көремін». Бағалар үшін емес — шын сезімің бойынша!":"Оцени каждый предмет и занятие от 1 до 10: 1 — «совсем не нравится», 10 — «очень люблю». Не по оценкам в школе — по настоящему чувству!"}</p>
+      <button class="btn" onclick="l_stage=1;render()">${t("next")}</button></div>`);
+    return;
+  }
+  if(l_stage===1 || l_stage===2){
+    const list = l_stage===1? LUPA.subjects : LUPA.activities;
+    const store = l_stage===1? R.subjects : R.activities;
+    const title = l_stage===1? (S.lang==='kz'?"Білім салалары":"Области знаний") : (S.lang==='kz'?"Ұнайтын істер":"Занятия, которые нравятся");
+    const allDone = list.every(x=>store[x.id]);
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">ЛУПа · ${title}</div>
+      ${list.map(x=>`<div style="margin-top:14px"><b style="font-size:14.5px">${T(x)}</b>
+        <div class="scale">${[1,2,3,4,5,6,7,8,9,10].map(n=>
+          `<button class="${store[x.id]===n?'on':''}" onclick="lSet('${l_stage===1?'subjects':'activities'}','${x.id}',${n})">${n}</button>`).join("")}</div></div>`).join("")}
+      <button class="btn" ${allDone?"":"disabled"} onclick="l_stage++;render()">${t("next")}</button></div>`);
+    return;
+  }
+  if(l_stage===3){
+    const probes = lupaProbes();
+    if(!probes.length){ l_stage=4; render(); return; }
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${S.lang==='kz'?'Нақтылау':'Уточнение'}</div>
+      ${probes.map(p=>`
+        <div class="ai" style="margin-top:16px"><div class="av">S</div><div class="bub"><b>${p.label}: ${p.score}/10</b> ${T(LUPA.probeQ)}</div></div>
+        <textarea id="lp_${p.id}" placeholder="${t('answer_ph')}">${R.probes[p.id]||""}</textarea>`).join("")}
+      <button class="btn" onclick="lProbesDone()">${t("done")}</button></div>`);
+    return;
+  }
+  app().insertAdjacentHTML("beforeend", `<div class="card center"><div class="big">🔍</div>
+    <h2>${S.lang==='kz'?'ЛУПа дайын!':'ЛУПа готова!'}</h2>
+    <p>${S.lang==='kz'?'Ертең — сен туралы үлкен сұхбат.':'Завтра — большое интервью о тебе.'}</p>
+    <button class="btn" onclick="l_stage=0;completeDay(2)">${t("home")}</button></div>`);
+};
+function lSet(kind,id,n){ S.res.lupa[kind][id]=n; save(); render(); }
+function lupaProbes(){
+  const R=S.res.lupa, out=[];
+  const all=[...LUPA.subjects.map(x=>({...x,score:R.subjects[x.id],kind:'s'})),...LUPA.activities.map(x=>({...x,score:R.activities[x.id],kind:'a'}))];
+  const ext = all.filter(x=>x.score<=2||x.score>=9).sort((a,b)=>Math.abs(5.5-b.score)-Math.abs(5.5-a.score));
+  return ext.slice(0,4).map(x=>({id:x.id,label:T(x),score:x.score}));
+}
+function lProbesDone(){
+  lupaProbes().forEach(p=>{ const v=document.getElementById("lp_"+p.id); if(v) S.res.lupa.probes[p.id]=v.value||""; });
+  l_stage=4; save(); render();
+}
+DEMO_FILLERS.push(function(){
+  const R=S.res.lupa;
+  LUPA.subjects.forEach(x=>R.subjects[x.id]=({math:9,inf:10,phys:8,geom:8,bio:7,hist:2}[x.id])||Math.floor(Math.random()*5)+3);
+  LUPA.activities.forEach(x=>R.activities[x.id]=({code:10,build:9,solve:9,research:8,lead:7,talk:4,teach:3}[x.id])||Math.floor(Math.random()*5)+2);
+  R.probes={inf:"Могу сидеть за кодом часами и не замечать времени.",hist:"Скучно зубрить даты, не вижу смысла."};
+});
+
+/* ============ ДЕНЬ 3. Нарративное интервью ============ */
+const NARR = [
+  {id:"dream", q:{r:"Начнем с детства 😊 Кем ты мечтал(а) стать лет в 6–8? Что именно тебя привлекало в этой мечте?", k:"Балалық шақтан бастайық 😊 6–8 жасыңда кім болғың келді? Ол арманда сені нақты не қызықтырды?"}},
+  {id:"clubs", q:{r:"На какие кружки и секции ты ходишь сейчас — и на какие ходил(а) раньше? Что бросил(а) и почему?", k:"Қазір қандай үйірмелер мен секцияларға барасың — бұрын қайда бардың? Нені тастадың және неге?"}},
+  {id:"self", q:{r:"А что ты изучаешь сам(а), без всяких «надо»? Каналы, видео, темы, в которые залипаешь?", k:"Ал «керек» дегенсіз, өз еркіңмен нені зерттейсің? Қандай арналар, видеолар, тақырыптарға шомасың?"}},
+  {id:"achieve", q:{r:"Чем ты гордишься? Что получилось круче всего — в учебе, хобби, где угодно?", k:"Немен мақтанасың? Оқуда, хоббиде — қай жерде ең керемет нәтиже шығардың?"}},
+  {id:"family", q:{r:"Кем работают твои близкие? Что они говорят о своей работе? Есть ли в семье «профессиональная династия»?", k:"Жақындарың кім болып жұмыс істейді? Олар жұмысы туралы не айтады? Отбасында «мамандық әулеті» бар ма?"}},
+  {id:"advice", q:{r:"Что советуют тебе родители, друзья, учителя про выбор профессии? Что из этого отзывается, а что раздражает?", k:"Ата-анаң, достарың, мұғалімдерің мамандық таңдау туралы не дейді? Қайсысы жаныңа жақын, қайсысы ашуландырады?"}},
+  {id:"work", q:{r:"Был ли у тебя опыт работы или подработки? Если да — что понравилось и не понравилось? (Если нет — это норм!)", k:"Жұмыс немесе қосымша табыс тәжірибең болды ма? Болса — не ұнады, не ұнамады? (Болмаса — оқасы жоқ!)"}},
+];
+let n_i = -1, n_fu = null, n_wait = false;
+SCREENS.day3 = function(){
+  if(n_i===-1){
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${t("day")} 3 · ${S.lang==='kz'?'Сұхбат':'Интервью'}</div>
+      <h1>🎙️ ${T(DAYS[2].title)}</h1>
+      <p>${S.lang==='kz'?"Бүгін сен — сүйікті подкаст қонағысың. 7 сұрақ — сен туралы. Дұрыс жауап жоқ, қызықты жауап бар. Толық нұсқада жауапты дауыспен айтуға болады.":"Сегодня ты — гость любимого подкаста. 7 вопросов — о тебе. Правильных ответов нет, есть интересные. В полной версии можно отвечать голосом."}</p>
+      <button class="btn" onclick="n_i=0;render()">${t("next")}</button></div>`);
+    return;
+  }
+  if(n_i>=NARR.length){
+    app().insertAdjacentHTML("beforeend", `<div class="card center"><div class="big">🎙️</div>
+      <h2>${S.lang==='kz'?'Тамаша сұхбат!':'Отличное интервью!'}</h2>
+      <p>${S.lang==='kz'?'Ертең — векторлар картасы: жылдам әрі қызық.':'Завтра — карта векторов: быстро и азартно.'}</p>
+      <button class="btn" onclick="n_i=-1;completeDay(3)">${t("home")}</button></div>`);
+    return;
+  }
+  const q = NARR[n_i];
+  if(n_fu){
+    app().insertAdjacentHTML("beforeend", `<div class="card">
+      <div class="tag">💬 ${S.lang==='kz'?'Нақтылау':'Уточнение'}</div>
+      <div class="me">${S.res.narrative[q.id]||""}</div>
+      <div class="ai"><div class="av">S</div><div class="bub">${n_fu}</div></div>
+      <textarea id="n_f" placeholder="${t('answer_ph')}"></textarea>
+      <button class="btn" onclick="nFollowDone()">${t("next")}</button></div>`);
+    return;
+  }
+  app().insertAdjacentHTML("beforeend", `<div class="card">
+    <div class="tag">${S.lang==='kz'?'Сұрақ':'Вопрос'} ${n_i+1} / ${NARR.length}</div>
+    <div class="prog"><i style="width:${n_i/NARR.length*100}%"></i></div>
+    <div class="ai"><div class="av">S</div><div class="bub">${T(q.q)}</div></div>
+    <textarea id="n_a" placeholder="${t('answer_ph')}">${S.res.narrative[q.id]||""}</textarea>
+    <div class="row">
+      <button class="btn ghost" ${n_wait?"disabled":""} onclick="nNext(true)">${t("skip")}</button>
+      <button class="btn" ${n_wait?"disabled":""} onclick="nNext(false)">${n_wait?(S.lang==='kz'?'⏳ ИИ ойланып жатыр…':'⏳ ИИ думает…'):t("next")}</button>
+    </div></div>`);
+};
+async function nNext(skip){
+  const q=NARR[n_i];
+  const el=document.getElementById("n_a");
+  const val=skip?"":(el?el.value:"")||"";
+  if(!skip){ S.res.narrative[q.id]=val; save(); }
+  if(!skip && val.replace(/\s+/g," ").length>12 && CONFIG.AI_URL && !aiOff){
+    n_wait=true; render();
+    const rep=await aiAsk([{role:"user",content:(S.lang==='kz'?"Сұхбат сұрағы: ":"Вопрос интервью: ")+T(q.q)+"\n"+(S.lang==='kz'?"Жасөспірімнің жауабы: ":"Ответ подростка: ")+val}]);
+    n_wait=false;
+    if(rep){ n_fu=rep; render(); return; }
+  }
+  n_i++; n_fu=null; save(); render();
+}
+function nFollowDone(){
+  const q=NARR[n_i];
+  S.res.narrative[q.id+"_ai_q"]=n_fu;
+  S.res.narrative[q.id+"_ai_a"]=document.getElementById("n_f").value||"";
+  n_fu=null; n_i++; save(); render();
+}
+DEMO_FILLERS.push(function(){
+  S.res.narrative={dream:"Хотел стать изобретателем, придумывать машины.",clubs:"Робототехника сейчас, раньше шахматы — бросил, стало скучно повторять дебюты.",self:"Смотрю видео про ИИ, стартапы и как устроены ракеты.",achieve:"Наша команда выиграла городской хакатон.",family:"Папа инженер, мама врач. Папа любит работу, мама устает от людей.",advice:"Родители говорят «иди в медицину, стабильно». Раздражает слово «стабильно».",work:"Летом делал сайты на заказ — понравилось, что сам себе хозяин."};
+});
+
+/* ============ ДЕНЬ 4. RIASEC-свайпы + Антирейтинг ============ */
+const RIASEC = [
+ {v:"R",r:"Разбирать и собирать механизмы, чтобы понять, как они устроены",k:"Құрылысын түсіну үшін механизмдерді бөлшектеп, қайта құрастыру"},
+ {v:"R",r:"Чинить технику, которая перестала работать",k:"Істен шыққан техниканы жөндеу"},
+ {v:"R",r:"Собирать вещи своими руками: мебель, модели, устройства",k:"Заттарды өз қолыңмен құрастыру: жиһаз, модельдер, құрылғылар"},
+ {v:"R",r:"Управлять техникой: дронами, машинами, станками",k:"Техниканы басқару: дрондар, көліктер, станоктар"},
+ {v:"R",r:"Ухаживать за животными или выращивать растения",k:"Жануарларды күту немесе өсімдіктер өсіру"},
+ {v:"R",r:"Работать на природе, а не в помещении",k:"Ғимарат ішінде емес, табиғатта жұмыс істеу"},
+ {v:"R",r:"Настраивать оборудование, чтобы все работало идеально",k:"Бәрі мінсіз жұмыс істеуі үшін жабдықты баптау"},
+ {v:"R",r:"Строить: видеть, как из чертежа вырастает реальный объект",k:"Құрылыс салу: сызбадан нақты нысан шыққанын көру"},
+ {v:"I",r:"Решать задачи, над которыми надо поломать голову",k:"Бас қатыруды талап ететін есептер шешу"},
+ {v:"I",r:"Проводить эксперименты и проверять гипотезы",k:"Эксперимент жүргізіп, болжамдарды тексеру"},
+ {v:"I",r:"Разбираться, почему что-то происходит именно так",k:"Бір нәрсенің неге дәл солай болатынын анықтау"},
+ {v:"I",r:"Анализировать данные и находить в них закономерности",k:"Деректерді талдап, олардан заңдылығын табу"},
+ {v:"I",r:"Читать и смотреть про науку, космос, технологии",k:"Ғылым, ғарыш, технологиялар туралы оқу және көру"},
+ {v:"I",r:"Писать код и учить компьютер делать то, что тебе нужно",k:"Код жазып, компьютерді өзіңе керек іске үйрету"},
+ {v:"I",r:"Изучать что-то сложное глубоко, становясь в этом экспертом",k:"Күрделі нәрсені терең зерттеп, сол салада сарапшы болу"},
+ {v:"I",r:"Решать математические и логические головоломки",k:"Математикалық және логикалық жұмбақтар шешу"},
+ {v:"A",r:"Рисовать, создавать иллюстрации или дизайн",k:"Сурет салу, иллюстрация немесе дизайн жасау"},
+ {v:"A",r:"Придумывать и писать истории, тексты, сценарии",k:"Хикаялар, мәтіндер, сценарийлер ойлап табу және жазу"},
+ {v:"A",r:"Снимать и монтировать видео",k:"Видео түсіру және монтаждау"},
+ {v:"A",r:"Заниматься музыкой: играть, петь, сочинять, сводить треки",k:"Музыкамен айналысу: ойнау, ән айту, шығару, трек жинау"},
+ {v:"A",r:"Выступать на сцене или в кадре",k:"Сахнада немесе кадрда өнер көрсету"},
+ {v:"A",r:"Придумывать стиль: образы, одежду, эстетику пространства",k:"Стиль ойлап табу: бейнелер, киім, кеңістік эстетикасы"},
+ {v:"A",r:"Фотографировать и создавать визуальные истории",k:"Суретке түсіріп, визуалды хикаялар жасау"},
+ {v:"A",r:"Придумывать идеи, которых еще не было",k:"Бұрын-соңды болмаған идеялар ойлап табу"},
+ {v:"S",r:"Объяснять другим сложные вещи так, чтобы они поняли",k:"Басқаларға күрделі нәрселерді түсінетіндей етіп түсіндіру"},
+ {v:"S",r:"Поддерживать человека, которому сейчас трудно",k:"Қазір қиналып жүрген адамды қолдау"},
+ {v:"S",r:"Заботиться о тех, кто нуждается в помощи",k:"Көмекке мұқтаж жандарға қамқорлық жасау"},
+ {v:"S",r:"Слушать людей и помогать им разобраться в себе",k:"Адамдарды тыңдап, өздерін түсінуге көмектесу"},
+ {v:"S",r:"Лечить людей или животных",k:"Адамдарды немесе жануарларды емдеу"},
+ {v:"S",r:"Работать в команде над общим делом",k:"Ортақ іс үшін командада жұмыс істеу"},
+ {v:"S",r:"Организовывать помощь тем, кому она нужна",k:"Көмек керек адамдарға көмекті ұйымдастыру"},
+ {v:"S",r:"Знакомиться с новыми людьми и объединять их",k:"Жаңа адамдармен танысып, оларды біріктіру"},
+ {v:"E",r:"Убеждать людей и отстаивать свою точку зрения",k:"Адамдарды сендіру және өз көзқарасыңды қорғау"},
+ {v:"E",r:"Презентовать идею так, чтобы в нее поверили",k:"Идеяны бәрі сенетіндей етіп таныстыру"},
+ {v:"E",r:"Вести переговоры и добиваться выгодных условий",k:"Келіссөз жүргізіп, тиімді шарттарға қол жеткізу"},
+ {v:"E",r:"Запускать свои проекты: от идеи до результата",k:"Өз жобаларыңды іске қосу: идеядан нәтижеге дейін"},
+ {v:"E",r:"Вести за собой команду",k:"Команданы соңыңнан ерту"},
+ {v:"E",r:"Соревноваться и выигрывать",k:"Жарысу және жеңу"},
+ {v:"E",r:"Продавать: находить того, кому нужно то, что у тебя есть",k:"Сату: сендегі нәрсе керек адамды табу"},
+ {v:"E",r:"Принимать быстрые решения в меняющейся ситуации",k:"Өзгермелі жағдайда жылдам шешім қабылдау"},
+ {v:"C",r:"Приводить хаос в порядок: раскладывать все по полочкам",k:"Бейберекетті ретке келтіру: бәрін өз орнына қою"},
+ {v:"C",r:"Составлять планы, таблицы и расписания",k:"Жоспарлар, кестелер құру"},
+ {v:"C",r:"Проверять работу на ошибки и точность",k:"Жұмысты қателер мен дәлдікке тексеру"},
+ {v:"C",r:"Вести учет: чтобы все сходилось до мелочей",k:"Есеп жүргізу: бәрі ұсақ-түйегіне дейін дәл болуы үшін"},
+ {v:"C",r:"Работать по четкому алгоритму с понятным результатом",k:"Нәтижесі айқын, нақты алгоритммен жұмыс істеу"},
+ {v:"C",r:"Систематизировать информацию: каталоги, базы, архивы",k:"Ақпаратты жүйелеу: каталогтар, базалар, мұрағаттар"},
+ {v:"C",r:"Следить за сроками и доводить процессы до конца",k:"Мерзімдерді қадағалап, процестерді соңына дейін жеткізу"},
+ {v:"C",r:"Организовывать документы и данные так, чтобы любой быстро нашел нужное",k:"Құжаттар мен деректерді кез келген адам тез табатындай реттеу"}
+];
+const ANTI = [
+ {id:"electr",v:"R",r:"Электрик",k:"Электрик"},{id:"farmer",v:"R",r:"Фермер",k:"Фермер"},
+ {id:"builder",v:"R",r:"Строитель",k:"Құрылысшы"},{id:"mech",v:"R",r:"Автомеханик",k:"Автомеханик"},
+ {id:"sci",v:"I",r:"Ученый-исследователь",k:"Ғалым-зерттеуші"},{id:"prog",v:"I",r:"Программист",k:"Бағдарламашы"},
+ {id:"data",v:"I",r:"Дата-аналитик (Data Scientist)",k:"Дата-талдаушы (Data Scientist)"},{id:"diag",v:"I",r:"Врач-диагност",k:"Дәрігер-диагност"},
+ {id:"design",v:"A",r:"Дизайнер",k:"Дизайнер"},{id:"actor",v:"A",r:"Актер",k:"Актер"},
+ {id:"journ",v:"A",r:"Журналист",k:"Журналист"},{id:"arch",v:"A",r:"Архитектор",k:"Сәулетші"},
+ {id:"teacher",v:"S",r:"Учитель",k:"Мұғалім"},{id:"psy",v:"S",r:"Психолог",k:"Психолог"},
+ {id:"ped",v:"S",r:"Врач-педиатр",k:"Педиатр-дәрігер"},{id:"social",v:"S",r:"Социальный работник",k:"Әлеуметтік қызметкер"},
+ {id:"prod",v:"E",r:"Продюсер / медиа-менеджер",k:"Продюсер / медиа-менеджер"},{id:"sales",v:"E",r:"Менеджер по продажам",k:"Сату менеджері"},
+ {id:"market",v:"E",r:"Маркетплейс-предприниматель",k:"Маркетплейс-кәсіпкері"},{id:"blog",v:"E",r:"Блогер",k:"Блогер"},
+ {id:"acc",v:"C",r:"Бухгалтер",k:"Бухгалтер"},{id:"cyber",v:"C",r:"Специалист по кибербезопасности",k:"Киберқауіпсіздік маманы"},
+ {id:"logist",v:"C",r:"Логист",k:"Логист"},{id:"notar",v:"C",r:"Нотариус",k:"Нотариус"}
+];
+let r_stage=0, r_i=0, r_deck=null;
+SCREENS.day4 = function(){
+  const R=S.res;
+  if(r_stage===0){
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${t("day")} 4</div>
+      <h1>🧭 ${T(DAYS[3].title)}</h1>
+      <p>${S.lang==='kz'?"48 карточка — әртүрлі істер. Ұзақ ойланба: алғашқы әсеріңмен жауап бер. Мамандықты, ақшаны немесе «қолымнан келе ме» дегенді емес — істің өзін елесте.":"48 карточек с разными занятиями. Не думай долго: отвечай первой реакцией. Представляй само занятие — не профессию, не деньги, не «получится ли»."}</p>
+      <button class="btn" onclick="r_stage=1;render()">${t("next")}</button></div>`);
+    return;
+  }
+  if(r_stage===1){
+    if(!r_deck) r_deck = shuffle(RIASEC.map((x,i)=>({...x,idx:i})));
+    if(r_i>=r_deck.length){ r_stage=2; render(); return; }
+    const c=r_deck[r_i];
+    app().insertAdjacentHTML("beforeend", `<div class="card">
+      <div class="tag">${r_i+1} / 48</div>
+      <div class="prog"><i style="width:${r_i/48*100}%"></i></div>
+      <div class="swipecard">${T(c)}</div>
+      <div class="swipebtns">
+        <button class="sb-no" onclick="rAns(${c.idx},0)">👎 ${t("dislike")}</button>
+        <button class="sb-mid" onclick="rAns(${c.idx},0.5)">😐 ${t("mid")}</button>
+        <button class="sb-yes" onclick="rAns(${c.idx},1)">❤️ ${t("like")}</button>
+      </div></div>`);
+    return;
+  }
+  if(r_stage===2){
+    const picks=R.anti.picks;
+    app().insertAdjacentHTML("beforeend", `<div class="card">
+      <div class="tag">${S.lang==='kz'?'Антирейтинг':'Антирейтинг'}</div>
+      <h2>${S.lang==='kz'?"Ешқашан айналыспайтын 5 мамандықты таңда":"Выбери 5 профессий, которыми ты не стал(а) бы заниматься ни за что"}</h2>
+      <p>${picks.length} / 5</p>
+      <div class="profgrid">
+        ${ANTI.map(p=>`<div class="prof ${picks.includes(p.id)?'on':''}" onclick="aPick('${p.id}')">${T(p)}</div>`).join("")}
+      </div>
+      <button class="btn" ${picks.length===5?"":"disabled"} onclick="r_stage=3;render()">${t("next")}</button></div>`);
+    return;
+  }
+  if(r_stage===3){
+    app().insertAdjacentHTML("beforeend", `<div class="card">
+      <div class="tag">${S.lang==='kz'?'Неге?':'Почему?'}</div>
+      <p>${S.lang==='kz'?"Әр таңдау бойынша қысқаша жаз: бұл істе сені нақты не итермелейді?":"По каждой напиши коротко: что именно в этом деле тебя отталкивает?"}</p>
+      ${S.res.anti.picks.map(id=>{const p=ANTI.find(x=>x.id===id);
+        return `<label class="f">${T(p)}</label><textarea style="min-height:56px" id="ar_${id}">${S.res.anti.reasons[id]||""}</textarea>`;}).join("")}
+      <button class="btn" onclick="aDone()">${t("done")}</button></div>`);
+    return;
+  }
+  app().insertAdjacentHTML("beforeend", `<div class="card center"><div class="big">🧭</div>
+    <h2>${S.lang==='kz'?'Векторлар картасы дайын!':'Карта векторов готова!'}</h2>
+    <button class="btn" onclick="r_stage=0;r_i=0;r_deck=null;completeDay(4)">${t("home")}</button></div>`);
+};
+function rAns(idx,val){ S.res.riasec[idx]=val; r_i++; save(); render(); }
+function aPick(id){
+  const p=S.res.anti.picks;
+  if(p.includes(id)) S.res.anti.picks=p.filter(x=>x!==id);
+  else if(p.length<5) p.push(id);
+  save(); render();
+}
+function aDone(){
+  S.res.anti.picks.forEach(id=>{const v=document.getElementById("ar_"+id); if(v) S.res.anti.reasons[id]=v.value||"";});
+  r_stage=4; save(); render();
+}
+function riasecScores(){
+  const sum={R:0,I:0,A:0,S:0,E:0,C:0}, cnt={R:0,I:0,A:0,S:0,E:0,C:0};
+  RIASEC.forEach((x,i)=>{ if(S.res.riasec[i]!==undefined){ sum[x.v]+=S.res.riasec[i]; cnt[x.v]++; }});
+  const out={}; Object.keys(sum).forEach(k=>out[k]= cnt[k]? +(sum[k]/cnt[k]).toFixed(2) : 0);
+  return out;
+}
+DEMO_FILLERS.push(function(){
+  RIASEC.forEach((x,i)=>{ S.res.riasec[i] = {R:.6,I:.9,A:.5,S:.2,E:.8,C:.35}[x.v] > Math.random()? 1 : (Math.random()>.5?0.5:0); });
+  S.res.anti.picks=["psy","acc","teacher","notar","diag"];
+  S.res.anti.reasons={psy:"Не хочу выслушивать чужие проблемы каждый день.",acc:"Умру со скуки от однообразных цифр.",teacher:"Каждый год одно и то же по программе.",notar:"Бумаги и печати — тоска.",diag:"Наверное, я не настолько умный, туда очень сложно поступить."};
+});
+
+/* ============ ДЕНЬ 5. Ценности (8 шкал /50) + Якоря Шейна (9 якорей /10) ============ */
+const VAL_SCALES = {
+  dev:{r:"Развитие себя",k:"Өзін-өзі дамыту"}, spirit:{r:"Духовное удовлетворение",k:"Рухани қанағат"},
+  creat:{r:"Креативность",k:"Креативтілік"}, soc:{r:"Активные социальные контакты",k:"Белсенді әлеуметтік байланыстар"},
+  prest:{r:"Собственный престиж",k:"Өз беделі"}, money:{r:"Высокое материальное положение",k:"Жоғары материалдық жағдай"},
+  achieve:{r:"Достижения",k:"Жетістіктер"}, indiv:{r:"Сохранение индивидуальности",k:"Өз даралығын сақтау"}
+};
+const VALUES = [
+ {s:"dev",r:"Мне нравится ощущение, что сегодня я умею больше, чем вчера",k:"Бүгін кешегіден көбірек білетінімді және істей алатынымды сезіну маған ұнайды"},
+ {s:"dev",r:"Я готов(а) тратить свободное время на курсы, книги и видео, которые делают меня сильнее в том, что мне интересно",k:"Қызықтыратын салада мықтырақ болу үшін бос уақытымды курстарға, кітаптарға және видеоларға жұмсауға дайынмын"},
+ {s:"dev",r:"Работа, в которой нечему учиться, быстро мне наскучит",k:"Үйренетін ештеңесі жоқ жұмыстан тез жалығамын"},
+ {s:"dev",r:"Мне важно видеть свой прогресс: новые уровни, навыки, результаты",k:"Өз прогресімді көру маңызды: жаңа деңгейлер, дағдылар, нәтижелер"},
+ {s:"dev",r:"Если я в чем-то слаб(а), мне хочется это прокачать, а не спрятать",k:"Бір нәрседен әлсіз болсам, оны жасырғаннан гөрі дамытқым келеді"},
+ {s:"spirit",r:"Мне важно, чтобы работа была интересна сама по себе, а не только зарплатой и результатами",k:"Жұмыс тек жалақысы мен нәтижесі үшін емес, өзі қызықты болғаны маған маңызды"},
+ {s:"spirit",r:"Лучшее состояние — когда я так увлечен(а) делом, что забываю о времени",k:"Ең жақсы күй — іске қатты беріліп, уақытты ұмытып кету"},
+ {s:"spirit",r:"Я не смогу долго заниматься делом, которое мне безразлично, даже за хорошие деньги",k:"Жақсы ақша төлесе де, өзіме мүлдем қызық емес іспен ұзақ айналыса алмаймын"},
+ {s:"spirit",r:"Мне хочется по-настоящему глубоко понимать то, чем я занимаюсь",k:"Айналысатын ісімді шын мәнінде терең түсінгім келеді"},
+ {s:"spirit",r:"Работа должна радовать самим процессом, а не только выходными",k:"Жұмыс тек демалыс күндерімен емес, процестің өзімен қуантуы керек"},
+ {s:"creat",r:"Мне быстро надоедает делать одно и то же одним и тем же способом",k:"Бір істі бір әдіспен қайталай беру мені тез жалықтырады"},
+ {s:"creat",r:"Я люблю придумывать свои способы решения, даже когда есть готовая инструкция",k:"Дайын нұсқаулық болса да, өз шешу жолдарымды ойлап тапқанды ұнатамын"},
+ {s:"creat",r:"Мне нравится создавать то, чего раньше не было: идеи, вещи, проекты, контент",k:"Бұрын болмаған нәрсені жасау маған ұнайды: идеялар, заттар, жобалар, контент"},
+ {s:"creat",r:"Если в работе ничего нельзя менять и улучшать, мне становится скучно",k:"Жұмыста ештеңені өзгертуге және жақсартуға болмаса, маған қызықсыз болады"},
+ {s:"creat",r:"Про меня можно сказать: «генератор идей»",k:"Мен туралы «идея генераторы» деуге болады"},
+ {s:"soc",r:"Мне нравится работать вместе с другими, а не в одиночку",k:"Жалғыз емес, басқалармен бірге жұмыс істеген маған ұнайды"},
+ {s:"soc",r:"Общение с разными людьми меня заряжает, а не утомляет",k:"Әртүрлі адамдармен қарым-қатынас мені шаршатпайды, керісінше қуат береді"},
+ {s:"soc",r:"Мне важно, чтобы на работе была своя команда — люди, с которыми хорошо и надежно",k:"Жұмыста өз командам болғаны маңызды — жақсы әрі сенімді адамдар"},
+ {s:"soc",r:"Я легко знакомлюсь и быстро нахожу общий язык с новыми людьми",k:"Жаңа адамдармен оңай танысып, тез тіл табысамын"},
+ {s:"soc",r:"Атмосфера в коллективе для меня не менее важна, чем сама работа",k:"Ұжымдағы атмосфера мен үшін жұмыстың өзінен кем емес маңызды"},
+ {s:"prest",r:"Мне важно, чтобы моя профессия звучала статусно и вызывала уважение",k:"Мамандығым мәртебелі естіліп, құрмет тудырғаны мен үшін маңызды"},
+ {s:"prest",r:"Мне приятно, когда моими успехами восхищаются значимые для меня люди",k:"Мен үшін маңызды адамдар жетістіктеріме сүйсінгені ұнайды"},
+ {s:"prest",r:"Я хотел(а) бы, чтобы о моих результатах знали не только близкие",k:"Нәтижелерім туралы тек жақындарым ғана емес, көпшілік білгенін қалаймын"},
+ {s:"prest",r:"Выбирая профессию, я думаю и о том, как она выглядит в глазах общества",k:"Мамандық таңдағанда оның қоғам көзіне қалай көрінетінін де ойлаймын"},
+ {s:"prest",r:"Мне важно признание: награды, звания, победы в конкурсах",k:"Мойындалу мен үшін маңызды: марапаттар, атақтар, байқаулардағы жеңістер"},
+ {s:"money",r:"Мне важно, чтобы будущая профессия давала высокий доход",k:"Болашақ мамандығым жоғары табыс әкелгені мен үшін маңызды"},
+ {s:"money",r:"Я хочу жизнь, в которой не приходится постоянно экономить",k:"Үнемі үнемдеуге мәжбүр болмайтын өмір сүргім келеді"},
+ {s:"money",r:"Сравнивая профессии, я всегда обращаю внимание на то, сколько в них зарабатывают",k:"Мамандықтарды салыстырғанда, оларда қанша табатынына әрқашан назар аударамын"},
+ {s:"money",r:"Деньги для меня — показатель того, что мой труд по-настоящему ценят",k:"Ақша мен үшін еңбегімнің шынымен бағаланғанының көрсеткіші"},
+ {s:"money",r:"Я готов(а) работать больше и сложнее, если это заметно увеличит мой доход",k:"Табысымды айтарлықтай арттыратын болса, көбірек және күрделірек жұмыс істеуге дайынмын"},
+ {s:"achieve",r:"Мне важно видеть конкретный результат своей работы, а не просто «процесс»",k:"Жай «процесс» емес, жұмысымның нақты нәтижесін көру маңызды"},
+ {s:"achieve",r:"Я люблю ставить цели и доводить дело до конца",k:"Алдыма мақсат қойып, істі соңына дейін жеткізгенді жақсы көремін"},
+ {s:"achieve",r:"Меня заряжают амбициозные задачи, где можно показать, на что я способен(-на)",k:"Неге қабілетті екенімді көрсете алатын өршіл міндеттер маған қуат береді"},
+ {s:"achieve",r:"Я чувствую настоящее удовлетворение, когда достигаю запланированного",k:"Жоспарлағаныма қол жеткізгенде, шынайы қанағат сезінемін"},
+ {s:"achieve",r:"Мне нравится, когда результат можно измерить: баллы, места, цифры, факты",k:"Нәтижемді өлшеуге болатыны ұнайды: балдар, орындар, сандар, фактілер"},
+ {s:"indiv",r:"Мне важно оставаться собой, даже если это не совпадает с ожиданиями окружающих",k:"Айналамдағылардың күткеніне сай келмесе де, өзім болып қалу мен үшін маңызды"},
+ {s:"indiv",r:"Меня привлекают редкие и необычные профессии, в которых можно выделиться",k:"Ерекшеленуге мүмкіндік беретін сирек әрі ерекше мамандықтар мені қызықтырады"},
+ {s:"indiv",r:"Я не люблю быть «как все» — в одежде, мнениях, планах на жизнь",k:"Киімде де, пікірде де, өмірлік жоспарда да «бәрі сияқты» болғанды ұнатпаймын"},
+ {s:"indiv",r:"Я готов(а) отказаться от выгодного варианта, если ради него придется «ломать себя»",k:"«Өзімді сындыруға» тура келетін болса да, тиімді нұсқадан бас тартуға дайынмын"},
+ {s:"indiv",r:"Мой стиль и мой взгляд на вещи — то, что я не хочу терять ни в какой работе",k:"Өз стилім мен көзқарасым — ешқандай жұмыста жоғалтқым келмейтін нәрсем"}
+];
+const SCH_SCALES = {
+  comp:{r:"Профессиональная компетентность",k:"Кәсіби шеберлік"}, mgmt:{r:"Менеджмент",k:"Басқару"},
+  auto:{r:"Автономия",k:"Дербестік"}, stabw:{r:"Стабильность работы",k:"Жұмыс тұрақтылығы"},
+  stabp:{r:"Стабильность места жительства",k:"Тұрғылықты жер тұрақтылығы"}, serve:{r:"Служение",k:"Қызмет ету"},
+  chall:{r:"Вызов",k:"Сынақ"}, integ:{r:"Интеграция стилей жизни",k:"Өмір салттарының үйлесімі"},
+  entr:{r:"Предпринимательство",k:"Кәсіпкерлік"}
+};
+const SCHEIN = [
+ {s:"comp",r:"Мне важно стать настоящим профи в своем деле — таким, к кому за советом обращаются даже взрослые специалисты",k:"Мен үшін өз ісімнің нағыз кәсіби шебері болу маңызды — тіпті тәжірибелі мамандардың өзі кеңес сұрайтын деңгейге жеткім келеді"},
+ {s:"comp",r:"Быть лучшим специалистом в своей теме круче, чем быть начальником, который разбирается во всем понемногу",k:"Барлық нәрседен аздап хабары бар басшы болғаннан гөрі, өз саласының үздік маманы болған әлдеқайда жақсы"},
+ {s:"comp",r:"Если мне что-то интересно, я хочу разобраться в этом по-настоящему глубоко, а не «на троечку»",k:"Бір нәрсеге қызығатын болсам, оны үстірт емес, шын мәнінде терең меңгергім келеді"},
+ {s:"mgmt",r:"Мне нравится организовывать работу других: решать, кто что делает, и отвечать за общий результат",k:"Басқалардың жұмысын ұйымдастыру маған ұнайды: кім не істейтінін шешіп, ортақ нәтижеге жауап беру"},
+ {s:"mgmt",r:"В командных проектах я обычно беру на себя роль лидера — или мне хочется ее взять",k:"Топтық жобаларда мен әдетте көшбасшы рөлін аламын немесе соны алғым келіп тұрады"},
+ {s:"mgmt",r:"Меня привлекает работа, где мои решения влияют на многих людей, даже если это большая ответственность",k:"Жауапкершілігі үлкен болса да, менің шешімдерім көп адамға әсер ететін жұмыс мені қызықтырады"},
+ {s:"auto",r:"Мне важно самому решать, когда, где и как я работаю",k:"Қашан, қайда және қалай жұмыс істейтінімді өзім шешкенім маңызды"},
+ {s:"auto",r:"Жесткие правила и инструкции меня напрягают, даже если они «для моего же блага»",k:"Қатаң ережелер мен нұсқаулықтар «өз пайдама» арналған болса да, маған ұнамайды"},
+ {s:"auto",r:"Я бы отказался(-ась) от престижной должности, если бы ради нее пришлось жить по чужому расписанию",k:"Біреудің кестесімен өмір сүруге тура келсе, беделді қызметтен де бас тартар едім"},
+ {s:"stabw",r:"Мне спокойнее, когда я уверен(а), что моя работа надежна и я не останусь без нее неожиданно",k:"Жұмысым сенімді екенін және кенеттен жұмыссыз қалмайтынымды білсем, көңілім тыныш"},
+ {s:"stabw",r:"Стабильная зарплата поменьше лучше, чем непредсказуемый доход побольше",k:"Болжап болмайтын үлкен табыстан гөрі, тұрақты, бірақ шамалы төмен жалақы жақсырақ"},
+ {s:"stabw",r:"Мне важно, чтобы у компании, в которой я работаю, было надежное будущее",k:"Мен жұмыс істейтін компанияның болашағы сенімді болғаны маңызды"},
+ {s:"stabp",r:"Я хочу строить жизнь в одном городе — там, где мои друзья, близкие и любимые места",k:"Мен өмірімді бір қалада құрғым келеді — достарым, жақындарым және сүйікті орындарым бар жерде"},
+ {s:"stabp",r:"Переезд в другой город или страну ради работы — для меня скорее стресс, чем приключение",k:"Жұмыс үшін басқа қалаға немесе елге көшу мен үшін қызықты оқиғадан гөрі күйзеліске жақын"},
+ {s:"stabp",r:"Остаться рядом с близкими для меня важнее, чем получить крутую работу далеко от дома",k:"Үйден алыстағы керемет жұмысқа қарағанда, жақындарымның қасында қалу маңыздырақ"},
+ {s:"serve",r:"Мне важно, чтобы моя работа делала жизнь других людей лучше",k:"Жұмысым басқа адамдардың өмірін жақсартқаны мен үшін маңызды"},
+ {s:"serve",r:"Я гордился(-ась) бы профессией, в которой помогаю людям, даже если она не самая денежная",k:"Табысы ең жоғары болмаса да, адамдарға көмектесетін мамандықты мақтан тұтар едім"},
+ {s:"serve",r:"Когда я делаю что-то полезное для других, я чувствую, что занимаюсь действительно важным делом",k:"Басқаларға пайдалы іс істегенде, шын мәнінде маңызды іспен айналысып жүргенімді сезінемін"},
+ {s:"chall",r:"Меня цепляют задачи, про которые говорят «это невозможно»",k:"«Бұл мүмкін емес» дейтін міндеттер мені қызықтырады"},
+ {s:"chall",r:"Соревноваться и побеждать — это про меня",k:"Жарысу және жеңу — бұл дәл мен туралы"},
+ {s:"chall",r:"Легкая, но скучная работа утомляет меня быстрее, чем сложная и напряженная",k:"Оңай, бірақ жалықтыратын жұмыс мені күрделі әрі қарқынды жұмыстан гөрі тезірек шаршатады"},
+ {s:"integ",r:"Работа — важная часть жизни, но не вся жизнь: время на семью, друзей и увлечения для меня так же ценно",k:"Жұмыс — өмірдің маңызды бөлігі, бірақ өмірдің бәрі емес: отбасыма, достарыма және қызығушылықтарыма арналған уақыт мен үшін сондай құнды"},
+ {s:"integ",r:"Я не хочу профессию, ради которой придется жертвовать личной жизнью, — даже очень престижную",k:"Жеке өмірімді құрбан етуді талап ететін мамандықты қаламаймын — тіпті ол өте беделді болса да"},
+ {s:"integ",r:"Идеальная работа — та, после которой остаются силы и время на все остальное, что я люблю",k:"Идеал жұмыс — өзім жақсы көретін басқа істерге күш пен уақыт қалдыратын жұмыс"},
+ {s:"entr",r:"Я хочу однажды создать что-то свое: бизнес, продукт или проект, который начнется с моей идеи",k:"Бір күні өзімнің ісімді бастағым келеді: өз идеямнан басталатын бизнес, өнім немесе жоба"},
+ {s:"entr",r:"Мне интереснее придумать и запустить свое дело, чем работать в чужой компании — даже очень известной",k:"Танымал болса да, біреудің компаниясында жұмыс істегеннен гөрі, өз ісімді ойлап тауып, іске қосқан қызықтырақ"},
+ {s:"entr",r:"Я готов(а) рисковать и пробовать, даже если есть шанс провалиться, — лишь бы дело было моим",k:"Ісім өзімдікі болса, сәтсіздік қаупі болса да, тәуекел етіп көруге дайынмын"}
+];
+const SCEN = [
+ {id:"s1",q:{r:"Представь: тебе предлагают два варианта будущего. Какой ближе?",k:"Елестетіп көр: саған болашақтың екі нұсқасын ұсынып отыр. Қайсысы жақынырақ?"},
+  a:{r:"Надежная работа в сильной компании с понятным карьерным ростом",k:"Мықты компаниядағы мансаптық өсу жолы айқын, сенімді жұмыс"},
+  b:{r:"Свое дело: доход непредсказуем, зато полная свобода решений",k:"Өз ісің: табысы болжаусыз, есесіне шешім қабылдау еркіндігі толық өзіңде"}},
+ {id:"s2",q:{r:"Что выберешь?",k:"Нені таңдар едің?"},
+  a:{r:"Руководить большой командой в крупном проекте",k:"Ірі жобадағы үлкен команданы басқару"},
+  b:{r:"Быть самым сильным экспертом, к которому эта команда приходит за решениями",k:"Сол команданың өзі шешім іздеп келетін ең мықты сарапшы болу"}},
+ {id:"s3",q:{r:"Представь два предложения о работе. Какое выберешь?",k:"Жұмыс туралы екі ұсынысты елестет. Қайсысын таңдайсың?"},
+  a:{r:"Очень высокая зарплата, но само дело тебе безразлично",k:"Жалақысы өте жоғары, бірақ ісі өзіңе мүлдем қызық емес"},
+  b:{r:"Дело, которое обожаешь, но доход средний",k:"Жаның сүйетін іс, бірақ табысы орташа"}}
+];
+let v_stage=0, v_page=0;
+const V_PER_PAGE=10;
+SCREENS.day5 = function(){
+  if(v_stage===0){
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${t("day")} 5</div>
+      <h1>💎 ${T(DAYS[4].title)}</h1>
+      <p>${S.lang==='kz'?"Екі бөлім: құндылықтар (40 тұжырым) және жұмыстағы қажеттіліктер (27 тұжырым). Әрқайсысына 1-ден 10-ға дейін баға бер: 1 — «мүлдем мен туралы емес», 10 — «дәл мен туралы». Дұрыс жауап жоқ — адал жауап бар.":"Две части: ценности (40 утверждений) и потребности в работе (27 утверждений). Оцени каждое от 1 до 10: 1 — «совсем не про меня», 10 — «точно про меня». Правильных ответов нет — есть честные."}</p>
+      <button class="btn" onclick="v_stage=1;v_page=0;render()">${t("next")}</button></div>`);
+    return;
+  }
+  if(v_stage===1 || v_stage===2){
+    const items = v_stage===1? VALUES : SCHEIN;
+    const store = v_stage===1? S.res.values : S.res.schein;
+    const pages = Math.ceil(items.length/V_PER_PAGE);
+    const slice = items.map((x,i)=>({...x,i})).slice(v_page*V_PER_PAGE,(v_page+1)*V_PER_PAGE);
+    const pageDone = slice.every(x=>store[x.i]);
+    const label = v_stage===1? (S.lang==='kz'?"Құндылықтар":"Ценности") : (S.lang==='kz'?"Қажеттіліктер":"Потребности");
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${label} · ${v_page+1}/${pages}</div>
+      <div class="prog"><i style="width:${(v_page)/pages*100}%"></i></div>
+      ${slice.map(x=>`<div style="margin-top:16px"><b style="font-size:14.5px; line-height:1.4; display:block">${T(x)}</b>
+        <div class="scale">${[1,2,3,4,5,6,7,8,9,10].map(n=>
+          `<button class="${store[x.i]===n?'on':''}" onclick="vSet(${v_stage},${x.i},${n})">${n}</button>`).join("")}</div></div>`).join("")}
+      <button class="btn" ${pageDone?"":"disabled"} onclick="vNext(${pages})">${t("next")}</button></div>`);
+    return;
+  }
+  if(v_stage===3){
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${S.lang==='kz'?'Соңғы 3 сұрақ':'Последние 3 вопроса'}</div>
+      ${SCEN.map(sc=>`<div style="margin-top:18px"><b>${T(sc.q)}</b>
+        <button class="opt ${S.res.scen[sc.id]==='a'?'on':''}" onclick="scPick('${sc.id}','a')">${T(sc.a)}</button>
+        <button class="opt ${S.res.scen[sc.id]==='b'?'on':''}" onclick="scPick('${sc.id}','b')">${T(sc.b)}</button></div>`).join("")}
+      <button class="btn" ${SCEN.every(s=>S.res.scen[s.id])?"":"disabled"} onclick="v_stage=4;render()">${t("done")}</button></div>`);
+    return;
+  }
+  app().insertAdjacentHTML("beforeend", `<div class="card center"><div class="big">💎</div>
+    <h2>${S.lang==='kz'?'Күшті жұмыс!':'Мощная работа!'}</h2>
+    <p>${S.lang==='kz'?'Ертең — Мультиғалам: 7 өмір сүріп көресің.':'Завтра — Мультивселенная: проживешь 7 жизней.'}</p>
+    <button class="btn" onclick="v_stage=0;completeDay(5)">${t("home")}</button></div>`);
+};
+function vSet(stage,i,n){ (stage===1?S.res.values:S.res.schein)[i]=n; save(); render(); }
+function vNext(pages){
+  if(v_page < pages-1){ v_page++; }
+  else if(v_stage===1){ v_stage=2; v_page=0; }
+  else { v_stage=3; }
+  render();
+}
+function scPick(id,v){ S.res.scen[id]=v; save(); render(); }
+function valScores(){
+  const out={}; Object.keys(VAL_SCALES).forEach(k=>out[k]=0);
+  VALUES.forEach((x,i)=>{ out[x.s]+= S.res.values[i]||0; });
+  return out; // /50
+}
+function schScores(){
+  const sum={},cnt={}; Object.keys(SCH_SCALES).forEach(k=>{sum[k]=0;cnt[k]=0;});
+  SCHEIN.forEach((x,i)=>{ if(S.res.schein[i]){sum[x.s]+=S.res.schein[i]; cnt[x.s]++;} });
+  const out={}; Object.keys(sum).forEach(k=>out[k]=cnt[k]?Math.round(sum[k]/cnt[k]):0);
+  return out; // /10
+}
+DEMO_FILLERS.push(function(){
+  const vmap={dev:8,spirit:8,creat:9,soc:5,prest:7,money:8,achieve:9,indiv:9};
+  VALUES.forEach((x,i)=>S.res.values[i]=Math.max(1,Math.min(10,vmap[x.s]+Math.floor(Math.random()*3)-1)));
+  const smap={comp:6,mgmt:7,auto:9,stabw:3,stabp:4,serve:6,chall:8,integ:6,entr:9};
+  SCHEIN.forEach((x,i)=>S.res.schein[i]=Math.max(1,Math.min(10,smap[x.s]+Math.floor(Math.random()*3)-1)));
+  S.res.scen={s1:"b",s2:"b",s3:"b"};
+});
+
+/* ============ ДЕНЬ 6. Мультивселенная (7 порталов) ============ */
+const MULTI = {
+  intro:{r:"Ученые ошибались: вселенная не одна. Есть шесть параллельных — и в каждой живет своя версия тебя. Сегодня у тебя есть ключ. Открывай порталы по одному и рассказывай, кем ты стал(а) в каждом мире. Правила мультивселенной: жизнь должна быть настоящей (без магии), из нашего времени и в рамках закона. Все остальное — можно.",
+         k:"Ғалымдар қателескен: ғалам біреу емес. Алты параллель ғалам бар — және әрқайсысында сенің басқа нұсқаң өмір сүреді. Бүгін сенде кілт бар. Порталдарды бір-бірлеп ашып, әр әлемде кім болғаныңды айтып бер. Мультиғалам ережелері: өмір шынайы болуы керек (сиқырсыз), біздің заманнан және заң аясында. Қалғанының бәрі — мүмкін."},
+  portals:[
+    {n:1,ttl:{r:"🌀 Свободная вселенная №1",k:"🌀 Еркін ғалам №1"},sub:{r:"Жизнь, которую ты прожил(а) бы с удовольствием",k:"Рақаттанып өмір сүретін өмірің"}},
+    {n:2,ttl:{r:"🌀 Свободная вселенная №2",k:"🌀 Еркін ғалам №2"},sub:{r:"Совсем другая жизнь — и тоже твоя",k:"Мүлдем басқа өмір — және ол да сенікі"}},
+    {n:3,ttl:{r:"🌀 Свободная вселенная №3",k:"🌀 Еркін ғалам №3"},sub:{r:"Третья жизнь: смелее!",k:"Үшінші өмір: батылырақ!"}},
+    {n:4,ttl:{r:"💰 Вселенная без денег",k:"💰 Ақшасыз ғалам"},sub:{r:"Здесь все профессии оплачиваются одинаково, жилье и вещи у всех равные. Кем ты стал(а)?",k:"Мұнда барлық мамандықтың жалақысы бірдей, баспана мен заттар бәрінде тең. Кім болдың?"}},
+    {n:5,ttl:{r:"🛡️ Вселенная без провала",k:"🛡️ Сәтсіздік жоқ ғалам"},sub:{r:"В этом мире у тебя гарантированно получается всё, за что берешься. Кем ты стал(а)?",k:"Бұл әлемде қолға алғаныңның бәрі міндетті түрде сәтті шығады. Кім болдың?"}},
+    {n:6,ttl:{r:"🕰️ Вселенная детства",k:"🕰️ Балалық шақ ғаламы"},sub:{r:"Жизнь из твоей детской мечты — какой она была бы сегодня, по-взрослому?",k:"Балалық арманыңдағы өмір — бүгін, ересекше, қандай болар еді?"}}
+  ],
+  pride:{ttl:{r:"👑 Вселенная Гордости",k:"👑 Мақтаныш ғаламы"},
+    reveal:{r:"⚡ Стоп… приборы показывают что-то странное. Открылся скрытый 7-й портал! В этом мире ты выбрал(а) жизнь, от которой твои близкие светятся от гордости и говорят всем: «Посмотрите, чего он(а) добился(-ась)!» Кем ты там стал(а)?",
+            k:"⚡ Тоқта… құрылғылар бір қызық нәрсе көрсетіп тұр. Жасырын 7-портал ашылды! Бұл әлемде сен жақындарың мақтаныштан жайнап, бәріне: «Қараңдар, ол неге қол жеткізді!» деп айтатын өмірді таңдадың. Онда кім болдың?"}},
+  f_who:{r:"Кто ты? (профессия / дело)",k:"Сен кімсің? (мамандық / іс)"},
+  f_where:{r:"Где живешь?",k:"Қайда тұрасың?"},
+  f_give:{r:"Что даешь людям?",k:"Адамдарға не бересің?"},
+  f_happy:{r:"Момент счастья: когда в этой жизни ты чувствуешь «я на своем месте»?",k:"Бақыт сәті: бұл өмірде қашан «мен өз орнымдамын» деп сезінесің?"},
+  geo:[{r:"Мой город",k:"Өз қалам"},{r:"Столица",k:"Елорда"},{r:"Другая страна",k:"Басқа ел"},{r:"Кочую по миру",k:"Әлемді аралап жүрмін"}]
+};
+let mv_i = -1; // -1 интро; 0..5 порталы; 6 ревил; 7 портал гордости; 8 финал
+if(!S.res.multi) S.res.multi = {lives:[{},{},{},{},{},{}], pride:{}};
+function mvForm(store, prefix){
+  return `
+    <label class="f">${T(MULTI.f_who)}</label><input type="text" id="${prefix}_who" value="${store.who||""}">
+    <label class="f">${T(MULTI.f_where)}</label><input type="text" id="${prefix}_where" value="${store.where||""}">
+    <div class="chips">${MULTI.geo.map(g=>`<div class="chip" onclick="document.getElementById('${prefix}_where').value='${T(g)}'">${T(g)}</div>`).join("")}</div>
+    <label class="f">${T(MULTI.f_give)}</label><input type="text" id="${prefix}_give" value="${store.give||""}">
+    <label class="f">${T(MULTI.f_happy)}</label><textarea id="${prefix}_happy" placeholder="${t('answer_ph')}">${store.happy||""}</textarea>`;
+}
+function mvRead(store, prefix){
+  ["who","where","give","happy"].forEach(k=>{ const v=document.getElementById(prefix+"_"+k); if(v) store[k]=v.value||""; });
+}
+SCREENS.day6 = function(){
+  if(!S.res.multi) S.res.multi = {lives:[{},{},{},{},{},{}], pride:{}};
+  if(mv_i===-1){
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${t("day")} 6</div>
+      <h1>🌀 ${T(DAYS[5].title)}</h1><p>${T(MULTI.intro)}</p>
+      <button class="btn" onclick="mv_i=0;render()">${S.lang==='kz'?'Бірінші порталды ашу':'Открыть первый портал'}</button></div>`);
+    return;
+  }
+  if(mv_i>=0 && mv_i<6){
+    const p=MULTI.portals[mv_i];
+    app().insertAdjacentHTML("beforeend", `<div class="card">
+      <div class="tag">${S.lang==='kz'?'Портал':'Портал'} ${p.n} / 7</div>
+      <div class="prog"><i style="width:${mv_i/7*100}%"></i></div>
+      <h2>${T(p.ttl)}</h2><p>${T(p.sub)}</p>
+      ${mvForm(S.res.multi.lives[mv_i],"mv")}
+      <button class="btn" onclick="mvRead(S.res.multi.lives[${mv_i}],'mv');mv_i++;save();render()">${S.lang==='kz'?'Келесі портал':'Следующий портал'}</button></div>`);
+    return;
+  }
+  if(mv_i===6){
+    app().insertAdjacentHTML("beforeend", `<div class="card center" style="border:1.5px solid var(--warn)">
+      <div class="big">👑</div><p class="ink" style="font-size:16px">${T(MULTI.pride.reveal)}</p>
+      <button class="btn" onclick="mv_i=7;render()">${S.lang==='kz'?'Жасырын порталды ашу':'Открыть скрытый портал'}</button></div>`);
+    return;
+  }
+  if(mv_i===7){
+    app().insertAdjacentHTML("beforeend", `<div class="card">
+      <div class="tag" style="color:var(--warn)">${S.lang==='kz'?'Портал':'Портал'} 7 / 7 · ${T(MULTI.pride.ttl)}</div>
+      ${mvForm(S.res.multi.pride,"mvp")}
+      <button class="btn" onclick="mvRead(S.res.multi.pride,'mvp');mv_i=8;save();render()">${t("done")}</button></div>`);
+    return;
+  }
+  app().insertAdjacentHTML("beforeend", `<div class="card center"><div class="big">🌀</div>
+    <h2>${S.lang==='kz'?'7 өмір өттің!':'7 жизней прожито!'}</h2>
+    <p>${S.lang==='kz'?'Ертең — үш кит және ақша туралы әңгіме.':'Завтра — разговор про три кита и деньги.'}</p>
+    <button class="btn" onclick="mv_i=-1;completeDay(6)">${t("home")}</button></div>`);
+};
+DEMO_FILLERS.push(function(){
+  S.res.multi={lives:[
+    {who:"Game-разработчик",where:"Алматы",give:"Игры, в которых люди отдыхают душой",happy:"Когда игроки пишут, что моя игра — их любимая"},
+    {who:"Основатель tech-стартапа",where:"Другая страна",give:"Продукты, которые упрощают жизнь",happy:"Момент, когда инвестор говорит «да»"},
+    {who:"Инженер-робототехник",where:"Астана",give:"Роботов, которые делают опасную работу вместо людей",happy:"Первый запуск робота, которого я собрал сам"},
+    {who:"Изобретатель",where:"Кочую по миру",give:"Решения проблем, которые никто не решил",happy:"Секунда, когда прототип заработал"},
+    {who:"Кардиохирург",where:"Алматы",give:"Спасенные жизни",happy:"Когда пациент после операции говорит «спасибо»"},
+    {who:"Конструктор машин",where:"Мой город",give:"Машины будущего",happy:"Вижу свою машину на дороге"}],
+    pride:{who:"Юрист-международник",where:"Столица",give:"Защиту интересов страны",happy:"Родители рассказывают обо мне гостям"}};
+});
+
+/* ============ ДЕНЬ 7. Три кита + деньги ============ */
+const WHALES = [
+ {id:"create", q:{r:"Первый кит 🐋 Что ты любишь создавать для других? Не потреблять (смотреть, играть), а именно создавать — то, чем могут пользоваться или что могут почувствовать другие люди.", k:"Бірінші кит 🐋 Басқалар үшін нені жасағанды жақсы көресің? Тұтыну емес (көру, ойнау), дәл жасау — басқа адамдар қолданатын немесе сезінетін нәрсе."}},
+ {id:"learn", q:{r:"Второй кит 🐋 Бывает такое, что не надоедает изучать: смотришь видео, читаешь, пробуешь — и через месяц все еще интересно. Про что это у тебя? Другими словами: чему ты готов(а) учиться очень долго, даже если никто не заставляет?", k:"Екінші кит 🐋 Кейде бір нәрсені зерттеу еш жалықтырмайды: видео көресің, оқисың, байқап көресің — бір айдан кейін де қызық. Сенде бұл не туралы? Басқаша айтқанда: ешкім мәжбүрлемесе де, неге өте ұзақ үйренуге дайынсың?"}},
+ {id:"give", q:{r:"Третий кит 🐋 Что ты можешь дать этому миру? Что станет чуть лучше от того, что ты работаешь?", k:"Үшінші кит 🐋 Бұл әлемге не бере аласың? Сенің жұмысыңның арқасында не сәл жақсарады?"}},
+];
+let w_stage=0;
+SCREENS.day7 = function(){
+  const R=S.res;
+  if(w_stage===0){
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${t("day")} 7</div>
+      <h1>🐋 ${T(DAYS[6].title)}</h1>
+      <p>${S.lang==='kz'?"Бүгін — ең терең үш сұрақ және ақша туралы адал әңгіме. Асықпа: бұл жауаптар картаңның жүрегі.":"Сегодня — три самых глубоких вопроса и честный разговор про деньги. Не спеши: эти ответы — сердце твоей карты."}</p>
+      <button class="btn" onclick="w_stage=1;render()">${t("next")}</button></div>`);
+    return;
+  }
+  if(w_stage>=1 && w_stage<=3){
+    const q=WHALES[w_stage-1];
+    app().insertAdjacentHTML("beforeend", `<div class="card">
+      <div class="tag">${w_stage} / 3</div>
+      <div class="ai"><div class="av">S</div><div class="bub">${T(q.q)}</div></div>
+      <textarea id="w_a" placeholder="${t('answer_ph')}">${R.whales[q.id]||""}</textarea>
+      <button class="btn" onclick="wNext('${q.id}')">${t("next")}</button></div>`);
+    return;
+  }
+  if(w_stage===4){
+    app().insertAdjacentHTML("beforeend", `<div class="card">
+      <div class="tag">${S.lang==='kz'?'Ақша туралы':'Про деньги'}</div>
+      <div class="ai"><div class="av">S</div><div class="bub">${S.lang==='kz'
+        ?"Енді екі сан айт (теңгемен, өз қалаң үшін). Бірінші: жаңа мамандық бойынша алғашқы жұмысыңа қандай жалақыдан бастап шығуға дайынсың?"
+        :"Теперь назови две цифры (в тенге, для твоего города). Первая: от какой зарплаты ты готов(а) выйти на свою первую работу по новой профессии?"}</div></div>
+      <input type="number" id="m_start" placeholder="₸" value="${R.money.start||""}">
+      <div class="ai"><div class="av">S</div><div class="bub">${S.lang==='kz'
+        ?"Екінші: 3–5 жылдан кейін, маман болғаныңда — қай сомадан бастап «жақсы табамын» деп сезінесің?"
+        :"Вторая: через 3–5 лет, когда станешь профессионалом — от какой суммы почувствуешь «я хорошо зарабатываю»?"}</div></div>
+      <input type="number" id="m_pro" placeholder="₸" value="${R.money.pro||""}">
+      <button class="btn" onclick="mNext()">${t("next")}</button></div>`);
+    return;
+  }
+  if(w_stage===5){
+    const hi = (S.res.money.start||0) > 500000;
+    app().insertAdjacentHTML("beforeend", `<div class="card">
+      <div class="ai"><div class="av">S</div><div class="bub">${
+        hi? (S.lang==='kz'?"Күшті мақсат! Бір сұрақ: сен тәжірибесіз жаңа маман жалдасаң, оған осынша төлер ме едің? Неге?":"Сильная планка! Один вопрос: если бы ты нанимал(а) новичка без опыта — платил(а) бы ему столько? Почему?")
+          : (S.lang==='kz'?"Түсінікті. Ал айтшы: неге дәл осы сома? Ол саған нені береді?":"Понятно. А скажи: почему именно эта сумма? Что она тебе дает?")}</div></div>
+      <textarea id="m_r" placeholder="${t('answer_ph')}">${S.res.money.reflect||""}</textarea>
+      <button class="btn" onclick="S.res.money.reflect=document.getElementById('m_r').value||'';w_stage=6;save();render()">${t("done")}</button></div>`);
+    return;
+  }
+  app().insertAdjacentHTML("beforeend", `<div class="card center"><div class="big">🐋</div>
+    <h2>${S.lang==='kz'?'Терең жауаптар!':'Глубокие ответы!'}</h2>
+    <p>${S.lang==='kz'?'Ертең — соңғы күн: бәрін бір бейнеге жинаймыз.':'Завтра — финальный день: собираем всё в одну картину.'}</p>
+    <button class="btn" onclick="w_stage=0;completeDay(7)">${t("home")}</button></div>`);
+};
+function wNext(id){ S.res.whales[id]=document.getElementById("w_a").value||""; w_stage++; save(); render(); }
+function mNext(){
+  S.res.money.start=+document.getElementById("m_start").value||0;
+  S.res.money.pro=+document.getElementById("m_pro").value||0;
+  w_stage=5; save(); render();
+}
+DEMO_FILLERS.push(function(){
+  S.res.whales={create:"Люблю делать приложения и штуки, которые упрощают людям жизнь.",learn:"Технологиям и тому, как устроен мир — это бесконечно.",give:"Хочу создать продукт, которым будут пользоваться миллионы."};
+  S.res.money={start:400000, pro:2000000, reflect:"Наверное новичку столько не платят, но я быстро учусь и готов доказывать делом."};
+});
+
+/* ============ ДЕНЬ 7. Синтез ============ */
+let sy_stage=0;
+function findConflicts(){
+  const sch=schScores(), ria=riasecScores(), val=valScores(), out=[];
+  if(sch.serve>=6 && ria.S<=0.35) out.push({r:"Ты хочешь, чтобы твоя работа помогала людям (служение "+sch.serve+"/10) — но занятия «про людей» тебя не привлекают (социальный вектор "+ria.S+"). Как думаешь, можно ли помогать людям, не работая с ними лицом к лицу?", k:"Жұмысың адамдарға көмектескенін қалайсың (қызмет ету "+sch.serve+"/10) — бірақ «адамдармен» істер сені қызықтырмайды (әлеуметтік вектор "+ria.S+"). Қалай ойлайсың, адамдармен бетпе-бет жұмыс істемей-ақ көмектесуге бола ма?"});
+  if(sch.stabw>=7 && (sch.entr>=7||sch.auto>=8)) out.push({r:"Тебе важна и надежность работы ("+sch.stabw+"/10), и свобода со своим делом. Эти желания часто тянут в разные стороны. Что из них ты выбрал бы, если бы пришлось?", k:"Саған жұмыс сенімділігі де ("+sch.stabw+"/10), өз ісіңмен еркіндік те маңызды. Бұл қалаулар жиі әр жаққа тартады. Таңдауға тура келсе, қайсысын таңдар едің?"});
+  const selfdoubt = S.res.anti.picks.filter(id=>/не потяну|не настолько|сложно поступить|не получится|қолымнан келмейді|жетпейді/i.test(S.res.anti.reasons[id]||""));
+  selfdoubt.forEach(id=>{ const p=ANTI.find(x=>x.id===id);
+    out.push({r:"Про профессию «"+p.r+"» ты сказал(а): «"+S.res.anti.reasons[id]+"». А если бы точно получилось — само дело тебе интересно?", k:"«"+p.k+"» мамандығы туралы: «"+S.res.anti.reasons[id]+"» дедің. Ал нақты қолыңнан келсе — істің өзі саған қызық па?", sd:true});
+  });
+  if(S.res.multi && S.res.multi.pride && S.res.multi.pride.who){
+    const pw=S.res.multi.pride.who.toLowerCase();
+    const freeL=S.res.multi.lives.slice(0,3).filter(l=>l.who);
+    const overlap=freeL.some(l=>{const w=l.who.toLowerCase();const a=w.split(/[\s-]+/)[0],b=pw.split(/[\s-]+/)[0];return a&&b&&(w.includes(b)||pw.includes(a));});
+    if(freeL.length && !overlap){
+      const names=freeL.map(l=>l.who).join(", ");
+      out.push({r:"Я заметил кое-что в твоей Мультивселенной. В свободных мирах ты — "+names+". А в «Мире гордости» — "+S.res.multi.pride.who+". Интересно, правда? Как думаешь, чья это мечта?",
+                k:"Мультиғаламыңнан бір нәрсе байқадым. Еркін әлемдерде сен — "+names+". Ал «Мақтаныш әлемінде» — "+S.res.multi.pride.who+". Қызық емес пе? Қалай ойлайсың, бұл кімнің арманы?", pride:true});
+    }
+  }
+  return out.slice(0,3);
+}
+SCREENS.day8 = function(){
+  if(sy_stage===0){
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${t("day")} 8 · ${S.lang==='kz'?'Финал':'Финал'}</div>
+      <h1>✨ ${T(DAYS[7].title)}</h1>
+      <p>${S.lang==='kz'?"Мен сенің барлық жауаптарыңды қарап шықтым. Бірнеше қызық нәрсе байқадым — соларды бірге тексерейік.":"Я просмотрел все твои ответы за неделю. Заметил несколько интересных вещей — давай проверим их вместе."}</p>
+      <button class="btn" onclick="sy_stage=1;render()">${t("next")}</button></div>`);
+    return;
+  }
+  if(sy_stage===1){
+    const cf = findConflicts();
+    if(!cf.length){ sy_stage=2; render(); return; }
+    app().insertAdjacentHTML("beforeend", `<div class="card"><div class="tag">${S.lang==='kz'?'Байқағаным':'Что я заметил'}</div>
+      ${cf.map((c,i)=>`<div class="ai" style="margin-top:14px"><div class="av">S</div><div class="bub">${T(c)}</div></div>
+        <textarea id="sy_${i}" placeholder="${t('answer_ph')}">${S.res.synth["q"+i]||""}</textarea>`).join("")}
+      <button class="btn" onclick="syDone(${cf.length})">${t("next")}</button></div>`);
+    return;
+  }
+  if(CONFIG.RESULTS_URL && !S.sentOk && sendState!=="sending") setTimeout(maybeSendResults,300);
+  app().insertAdjacentHTML("beforeend", `<div class="card center"><div class="big">💌</div>
+    <h2>${S.lang==='kz'?'Апта аяқталды':'Неделя завершена'}</h2>
+    <p>${t("synth_wait")}</p>
+    ${CONFIG.RESULTS_URL? `<p style="font-size:13px;margin-top:8px">${(S.sentOk||sendState==="ok")? (S.lang==='kz'?"✅ Нәтижелер тәлімгерге автоматты жіберілді":"✅ Результаты автоматически отправлены наставнику") : sendState==="err"? (S.lang==='kz'?"⚠️ Жіберілмеді — файлды жүктеп, өзің жібер":"⚠️ Не отправилось — скачай файл и отправь сам(а)") : (S.lang==='kz'?"⏳ Нәтижелерді жіберудеміз…":"⏳ Отправляю результаты…")}</p>`:""}
+    <button class="btn" onclick="sy_stage=0;completeDay(8)">${t("home")}</button>
+    <button class="btn ghost" onclick="exportResults()">📤 ${S.lang==='kz'?'Нәтижелер файлын жүктеу (тәлімгерге жібер)':'Скачать файл результатов (отправь наставнику)'}</button></div>`);
+};
+function syDone(n){
+  for(let i=0;i<n;i++){ const v=document.getElementById("sy_"+i); if(v) S.res.synth["q"+i]=v.value||""; }
+  sy_stage=2; save(); render();
+}
+DEMO_FILLERS.push(function(){
+  S.res.synth={q0:"Хм, вообще да — можно делать медицинские приборы или приложения для здоровья.",q1:"Наверное свободу, стабильность — это скорее про родителей.",q2:"Если честно, медицина мне правда интересна, просто боюсь не поступить."};
+});
+
+/* ============ ОТЧЕТ (режим консультанта) ============ */
+const VEC_NAMES = {R:{r:"Реалистичный (техника)",k:"Реалистік (техника)"},I:{r:"Интеллектуальный (исследования)",k:"Зияткерлік (зерттеу)"},A:{r:"Артистический (творчество)",k:"Артистік (шығармашылық)"},S:{r:"Социальный (люди)",k:"Әлеуметтік (адамдар)"},E:{r:"Предпринимательский (влияние)",k:"Кәсіпкерлік (ықпал)"},C:{r:"Конвенциальный (порядок)",k:"Конвенциялық (тәртіп)"}};
+const NEED_NAMES = {P:{r:"Власть (организовывать)",k:"Билік (ұйымдастыру)"},A:{r:"Причастность (люди)",k:"Қатыстылық (адамдар)"},D:{r:"Достижения (задачи)",k:"Жетістік (міндеттер)"}};
+const SCH_TIP = {
+  comp:{r:"Важно быть мастером своего дела: глубина, экспертиза, «спроси у него — он знает».",k:"Өз ісінің шебері болу маңызды: тереңдік, сараптама."},
+  mgmt:{r:"Привлекает управление: люди, решения, ответственность за общий результат.",k:"Басқару қызықтырады: адамдар, шешімдер, ортақ нәтижеге жауапкершілік."},
+  auto:{r:"Ключевая ценность — свобода: сам решает, когда, где и как работать.",k:"Басты құндылық — еркіндік: қашан, қайда, қалай жұмыс істеуді өзі шешеді."},
+  stabw:{r:"Нужна опора: надежная работа и предсказуемый доход.",k:"Тірек керек: сенімді жұмыс және болжамды табыс."},
+  stabp:{r:"Важно жить там, где корни: близкие, друзья, свой город.",k:"Тамыры бар жерде өмір сүру маңызды: жақындары, достары, өз қаласы."},
+  serve:{r:"Смысл — основа: работа должна делать жизнь людей лучше.",k:"Мағына — негіз: жұмыс адамдар өмірін жақсартуы керек."},
+  chall:{r:"Заряжают сложные задачи, конкуренция и «это невозможно».",k:"Күрделі міндеттер, бәсеке және «мүмкін емес» қуат береді."},
+  integ:{r:"Жизнь больше работы: баланс с семьей, друзьями, увлечениями.",k:"Өмір жұмыстан үлкен: отбасы, достар, қызығушылықтармен тепе-теңдік."},
+  entr:{r:"Хочет создавать свое: дело, продукт, проект со своим именем.",k:"Өзінікін жасағысы келеді: іс, өнім, өз есімімен жоба."}
+};
+const VAL_TIP = {
+  dev:{r:"Главная валюта — рост: новые навыки, уровни, горизонты.",k:"Басты валюта — өсу: жаңа дағдылар, деңгейлер."},
+  spirit:{r:"Дело должно быть интересно само по себе — процесс важнее зарплаты.",k:"Іс өзі қызықты болуы керек — процесс жалақыдан маңызды."},
+  creat:{r:"Важно создавать новое и делать по-своему; рутина гасит.",k:"Жаңаны жасау және өзінше істеу маңызды; бірсарындылық сөндіреді."},
+  soc:{r:"Люди — источник энергии: команда, общение, «свои» рядом.",k:"Адамдар — қуат көзі: команда, қарым-қатынас."},
+  prest:{r:"Важно признание и уважение к профессии. Риск: выбрать «престижное» вместо «своего».",k:"Мойындалу мен құрмет маңызды. Қауіп: «өзінікінің» орнына «беделдіні» таңдау."},
+  money:{r:"Важен достойный доход; смотреть на доходность сфер — но платят специалистам, а не профессиям.",k:"Лайықты табыс маңызды; ақшаны мамандыққа емес, мықты мамандарға төлейді."},
+  achieve:{r:"Человек результата: цели, финиши, измеримые итоги.",k:"Нәтиже адамы: мақсаттар, өлшенетін қорытындылар."},
+  indiv:{r:"Важно оставаться собой; привлекают редкие и необычные пути.",k:"Өзі болып қалу маңызды; сирек жолдар қызықтырады."}
+};
+function mccScores(){
+  const w={P:0,A:0,D:0}; let n=0;
+  S.res.game.pattern.forEach((tg,i)=>{ if(tg){ const wt = i===7?2:1; w[tg]+=wt; n+=wt; }});
+  const out={}; Object.keys(w).forEach(k=>out[k]= n? Math.round(w[k]/n*100):0);
+  return out;
+}
+function bars(entries, max, names, tips){
+  return entries.map(([k,v])=>`<div class="bar">
+    <div class="bl"><span>${T(names[k])}</span><b>${v}${max===1?"":"/"+max}</b></div>
+    <div class="bt"><i style="width:${(max===1?v:v/max)*100}%"></i></div>
+    ${tips&&tips[k]?`<p style="font-size:12.5px;margin-top:3px">${T(tips[k])}</p>`:""}
+  </div>`).join("");
+}
+SCREENS.report = function(){
+  const ria=riasecScores(), mcc=mccScores(), sch=schScores(), val=valScores();
+  const riaSorted=Object.entries(ria).sort((a,b)=>b[1]-a[1]);
+  const schSorted=Object.entries(sch).sort((a,b)=>b[1]-a[1]);
+  const valSorted=Object.entries(val).sort((a,b)=>b[1]-a[1]);
+  const topVec=riaSorted.slice(0,3).filter(x=>x[1]>=0.5);
+  const lupaTop=[...LUPA.subjects.map(x=>({...x,sc:S.res.lupa.subjects[x.id]||0})),...LUPA.activities.map(x=>({...x,sc:S.res.lupa.activities[x.id]||0}))].filter(x=>x.sc>=7).sort((a,b)=>b.sc-a.sc).slice(0,10);
+  const sdIds = S.res.anti.picks.filter(id=>/не потяну|не настолько|сложно поступить|не получится|қолымнан келмейді|жетпейді/i.test(S.res.anti.reasons[id]||""));
+  const conflicts = findConflicts();
+  const prideFlag = conflicts.some(c=>c.pride);
+  const kz = S.lang==='kz';
+  app().insertAdjacentHTML("beforeend", `
+   <div class="card report">
+    <div class="tag" style="background:#3d2038;color:var(--warn)">${kz?"ЕСЕП ЖОБАСЫ · кеңесші растағанға дейін жарияланбайды":"ЧЕРНОВИК ОТЧЕТА · не публикуется до подтверждения консультантом"}</div>
+    <h1>${S.profile.name||"—"}${S.profile.age? ", "+S.profile.age:""}</h1>
+    <p>${kz?"Трек":"Трек"}: ${{kz:kz?"Қазақстан (ҰБТ)":"Казахстан (ЕНТ)",abroad:kz?"Шетел":"За рубеж",both:kz?"Екі нұсқа":"Оба варианта",undecided:kz?"Анықталмаған — 7-күні талқыланды":"Не определен — обсуждалось в День 7"}[S.profile.track]||"—"} · ${S.profile.city||""}
+    ${S.profile.voluntary===false? " · <b style='color:var(--warn)'>"+(kz?"бағдарламаға өз еркімен келмеген":"участие не добровольное")+"</b>":""}</p>
+
+    <h3>1. ${kz?"Кәсіби векторлар (Холланд)":"Профессиональные вектора (Холланд)"}</h3>
+    <div class="sec">${bars(riaSorted,1,VEC_NAMES)}
+      <p class="ink" style="margin-top:10px"><b>${kz?"Ұсынылатын векторлар":"Рекомендуемые вектора"}:</b> ${topVec.map(x=>T(VEC_NAMES[x[0]])).join(" · ")||"—"}</p></div>
+
+    <h3>2. ${kz?"Жұмыстағы қажеттіліктер (Макклеланд, ойын бойынша)":"Потребности в работе (Макклеланд, по игре)"}</h3>
+    <div class="sec">${bars(Object.entries(mcc).sort((a,b)=>b[1]-a[1]),100,NEED_NAMES)}
+      ${Object.values(S.res.game.open).filter(Boolean).map(x=>`<p>«${x}»</p>`).join("")}</div>
+
+    <h3>3. ${kz?"Мансап якорьлары (Шейн)":"Якоря карьеры (Шейн)"}</h3>
+    <div class="sec">${bars(schSorted.slice(0,5),10,SCH_SCALES,SCH_TIP)}</div>
+
+    <h3>4. ${kz?"Құндылықтар":"Ценности"}</h3>
+    <div class="sec">${bars(valSorted.slice(0,5),50,VAL_SCALES,VAL_TIP)}</div>
+
+    <h3>5. ${kz?"Қызығушылықтар (ЛУПа, 7+)":"Интересы (ЛУПа, 7+)"}</h3>
+    <div class="sec">${lupaTop.map(x=>`<span class="pill">${T(x)} · ${x.sc}</span>`).join("")||"—"}
+      ${Object.entries(S.res.lupa.probes).filter(x=>x[1]).map(x=>`<p>«${x[1]}»</p>`).join("")}</div>
+
+    <h3>6. ${kz?"Антирейтинг (Готтфредсон)":"Антирейтинг (Готтфредсон)"}</h3>
+    <div class="sec">${S.res.anti.picks.map(id=>{const p=ANTI.find(x=>x.id===id);
+      return `<p><b>${T(p)}:</b> «${S.res.anti.reasons[id]||"—"}»</p>`;}).join("")||"—"}</div>
+
+    ${sdIds.length? `<h3 style="color:var(--warn)">⚠️ ${kz?"Компромисс аймағы (SELFDOUBT)":"Зона компромисса (SELFDOUBT)"}</h3>
+    <div class="sec" style="border:1.5px solid var(--warn)">
+      <p class="ink">${kz?"Қызығушылықтан емес, «қолымнан келмейді» дегеннен бас тартулар — ықтимал «көмілген армандар»:":"Отказы не из-за интереса, а из-за «не потяну» — возможные «похороненные мечты»:"}</p>
+      ${sdIds.map(id=>{const p=ANTI.find(x=>x.id===id); return `<p><b>${T(p)}:</b> «${S.res.anti.reasons[id]}»</p>`;}).join("")}
+      ${S.res.synth.q2? `<p class="ink">${kz?"7-күнгі тексеру":"Проверка в День 7"}: «${S.res.synth.q2}»</p>`:""}</div>`:""}
+
+    <h3>7. ${kz?"Мультиғалам (7 өмір)":"Мультивселенная (7 жизней)"}</h3>
+    <div class="sec">
+      ${(S.res.multi&&S.res.multi.lives?S.res.multi.lives:[]).map((l,i)=>l.who?`<p><b>${i+1}. ${l.who}</b> · ${l.where||"—"}${l.give?" · "+l.give:""}</p>`:"").join("")||"—"}
+      ${S.res.multi&&S.res.multi.pride&&S.res.multi.pride.who?`<p style="color:var(--warn)"><b>👑 ${kz?"Мақтаныш ғаламы":"Вселенная Гордости"}: ${S.res.multi.pride.who}</b> · ${S.res.multi.pride.where||"—"}${prideFlag?" · 🚩 "+(kz?"еркін әлемдермен сәйкес емес":"не совпадает со свободными мирами"):""}</p>`:""}
+    </div>
+
+    ${conflicts.length? `<h3>8. ${kz?"Ішкі қайшылық гипотезалары":"Гипотезы внутренних конфликтов"}</h3>
+    <div class="sec">${conflicts.map((c,i)=>`<p class="ink">• ${T(c)}</p>${S.res.synth["q"+i]?`<p>${kz?"Жауабы":"Ответ"}: «${S.res.synth["q"+i]}»</p>`:""}`).join("")}</div>`:""}
+
+    <h3>9. ${kz?"Үш кит және ақша":"Три кита и деньги"}</h3>
+    <div class="sec">
+      ${S.res.whales.create?`<p><b>${kz?"Жасайды":"Создает"}:</b> «${S.res.whales.create}»</p>`:""}
+      ${S.res.whales.learn?`<p><b>${kz?"Үйренеді":"Учится"}:</b> «${S.res.whales.learn}»</p>`:""}
+      ${S.res.whales.give?`<p><b>${kz?"Береді":"Дает"}:</b> «${S.res.whales.give}»</p>`:""}
+      <p><b>${kz?"Ақша күтулері":"Денежные ожидания"}:</b> ${(S.res.money.start||0).toLocaleString()} ₸ → ${(S.res.money.pro||0).toLocaleString()} ₸
+      ${S.res.money.reflect? `· «${S.res.money.reflect}»`:""}</p></div>
+
+    <h3>10. ${kz?"Кеңесшіге арналған жалаулар":"Флаги для консультанта"}</h3>
+    <div class="sec">
+      ${S.profile.voluntary===false? `<p>🚩 ${kz?"Өз еркімен емес — мотивацияны тексеру":"Недобровольное участие — проверить мотивацию"}</p>`:""}
+      ${prideFlag? `<p>🚩 ${kz?"Отбасылық сценарий (Мақтаныш ғаламы)":"Семейный сценарий (Вселенная Гордости)"}</p>`:""}
+      ${sdIds.length? `<p>🚩 SELFDOUBT: ${sdIds.length} ${kz?"мамандық":"проф."}</p>`:""}
+      ${(S.res.money.start||0)>500000? `<p>🚩 ${kz?"Бастапқы жалақы күтуі жоғары":"Завышенные стартовые ожидания"}</p>`:""}
+      <p>ℹ️ ${kz?"Толық нұсқада мұнда: ИИ-дің «Қосымша түсініктемелер» бөлімінің жобасы (векторлар ішіндегі мамандықтар, негізгі қайшылық, тәуекелдер) — кеңесші растайды/түзетеді.":"В полной версии здесь: сгенерированный ИИ черновик раздела «Дополнительные комментарии» (профессии внутри векторов, ключевой конфликт, риски) — консультант подтверждает/правит."}</p></div>
+
+    <button class="btn" onclick="go('home')">${t("home")}</button>
+    <button class="btn ghost" onclick="if(confirm('${kz?"Барлық деректерді өшіру?":"Сбросить все данные прототипа?"}')){localStorage.removeItem('sana_proto');location.reload();}">${kz?"Прототипті қалпына келтіру":"Сбросить прототип"}</button>
+   </div>`);
+};
+
+//<DATA_AND_MODULES>
+
+render();
+</script>
+</body>
+</html>

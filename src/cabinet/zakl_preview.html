@@ -1,0 +1,108 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+:root{
+  --lilac:#B49AC8; --lilac-d:#9B7FB5; --mint:#8FC5B5; --mint-d:#6FAE9B;
+  --ink:#1f2130; --muted:#666a7d; --line:#e3dcec; --bg:#f7f5fa;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding:22px}
+h1.page{font-size:26px;margin:0 0 4px}
+h1.page b{color:var(--lilac-d)}
+.sub{color:var(--muted);margin:0 0 18px;font-size:14px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.panel h2{font-size:15px;text-transform:uppercase;letter-spacing:.6px;color:var(--lilac-d);margin:0 0 14px}
+label.f{display:block;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:14px 0 6px}
+input[type=text],input[type=date],textarea,select{width:100%;padding:11px 13px;border:1.5px solid var(--line);
+  border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:90px;resize:vertical;line-height:1.55}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.btn{background:var(--lilac);color:#fff;border:none;border-radius:10px;padding:11px 20px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn:hover{background:var(--lilac-d)}
+.btn.ghost{background:#fff;color:var(--lilac-d);border:1.5px solid var(--lilac)}
+.btn.mint{background:var(--mint-d)}
+.btn.sm{padding:7px 13px;font-size:13px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.vecgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px}
+.vec{display:flex;align-items:center;gap:9px;padding:9px 12px;border:1.5px solid var(--line);
+  border-radius:10px;cursor:pointer;background:#fff;font-size:14px}
+.vec.on{border-color:var(--lilac);background:#f6f1fa}
+.vec input{margin:0;width:16px;height:16px;accent-color:var(--lilac-d)}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+.warn{font-size:13px;color:#a05a00;background:#fff6e6;border-left:3px solid #e0a13a;
+  padding:9px 12px;border-radius:0 8px 8px 0;margin-top:10px}
+.vecblock{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px;background:#fbfafd}
+.vecblock h3{margin:0 0 4px;font-size:15px;color:var(--lilac-d)}
+.prof{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13.5px}
+.prof:hover{background:#f2ecf8}
+.prof input{margin-top:3px;width:15px;height:15px;accent-color:var(--lilac-d);flex-shrink:0}
+.prof b{display:block}
+.prof span{color:var(--muted);font-size:12.5px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.chip{border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:13.5px;background:#fff}
+.chip.on{border-color:var(--mint-d);background:#eef7f4;color:#31705f;font-weight:600}
+.eduitem{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px;background:#fbfafd}
+.eduitem .row3{gap:10px}
+.del{background:none;border:none;color:#b04a4a;cursor:pointer;font-size:13px;padding:4px 0;font-weight:600}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab{padding:9px 18px;border-radius:10px;border:1.5px solid var(--line);background:#fff;
+  cursor:pointer;font-weight:700;font-size:14px;color:var(--muted)}
+.tab.on{background:var(--lilac);border-color:var(--lilac);color:#fff}
+#preview{display:none}
+
+/* ---------- ДОКУМЕНТ ---------- */
+.doc{background:#fff;max-width:820px;margin:0 auto;padding:0}
+.pg{padding:54px 62px;position:relative;overflow:hidden;border-bottom:1px dashed #ddd}
+.pg:last-child{border-bottom:none}
+.doc h1{font-size:30px;font-weight:800;text-align:center;margin:0 0 24px;line-height:1.25}
+.doc h1 .l{color:var(--lilac)}
+.doc h1 .m{color:var(--mint)}
+.doc h2{font-size:21px;font-weight:800;margin:0 0 16px;color:var(--lilac-d);line-height:1.3}
+.doc h3{font-size:16px;font-weight:800;margin:20px 0 8px}
+.doc p{margin:0 0 11px;font-size:14px;line-height:1.62}
+.doc ul{margin:0 0 12px;padding-left:20px}
+.doc li{font-size:14px;line-height:1.6;margin-bottom:6px}
+.small{font-size:12.5px;color:var(--muted);line-height:1.5}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+.blogo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--lilac),var(--mint));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:17px;flex-shrink:0}
+.bname{font-weight:800;font-size:15px;line-height:1.15}
+.bname i{display:block;font-style:normal;font-size:10.5px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.7px;margin-top:2px}
+.field{margin:18px 0}
+.field .lb{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}
+.field .vl{font-size:19px;font-weight:800;margin-top:3px}
+.vecpill{border:2px solid var(--lilac);border-radius:12px;padding:12px 16px;margin-bottom:9px;font-weight:700;font-size:15px}
+.vecpill.main{border-color:var(--mint-d);background:#eef7f4}
+.tagmain{display:inline-block;background:var(--mint-d);color:#fff;font-size:11px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.5px;padding:3px 9px;border-radius:99px;margin-left:8px;vertical-align:middle}
+.crit{border-left:3px solid var(--lilac);padding:2px 0 2px 14px;margin:0 0 16px}
+.crit b{display:block;margin-bottom:3px}
+.pblock{margin-bottom:16px}
+.pblock .pn{font-weight:800;font-size:14.5px}
+.pblock .pd{font-size:13.5px;color:#3a3d4d;line-height:1.6;margin-top:2px}
+.edu{margin-bottom:14px}
+.edu .en{font-weight:800;font-size:14px}
+.edu .ed{font-size:13.5px;line-height:1.55;margin-top:2px}
+.edu .eu{font-size:12.5px;color:var(--lilac-d);word-break:break-all}
+.deco{position:absolute;border-radius:50%;pointer-events:none}
+.d1{width:230px;height:230px;border:14px solid var(--mint);opacity:.28;right:-95px;top:-70px}
+.d2{width:150px;height:150px;border:12px solid #F2C94C;opacity:.32;left:-72px;bottom:-52px}
+.free{white-space:pre-wrap;font-size:13.5px;line-height:1.65}
+.foot{margin-top:34px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between}
+
+@media print{
+  body{background:#fff}
+  .wrap{padding:0;max-width:none}
+  .noprint{display:none!important}
+  .doc{max-width:none}
+  .pg{padding:16mm 15mm;border:none;page-break-after:always}
+  .pg:last-child{page-break-after:auto}
+  @page{size:A4;margin:0}
+}
+@media(max-width:760px){.row,.row3,.vecgrid{grid-template-columns:1fr}.pg{padding:26px 20px}}
+
+body{background:#fff}.pg{border-bottom:2px solid #ccc}</style></head><body><div class="doc"><div class="pg"><div class="deco d1"></div><div class="deco d2"></div><div class="brand"><div class="blogo">S</div><div class="bname">Sana Space<i>Лаборатория карьерного проектирования</i></div></div><h1><span class="l">Заключение</span> для участника<br>программы <span class="m">«Выбор профессии 3.0»</span></h1><p>Данное заключение является дополнением к консультации по итогам программы, на которой подробно обсуждаются наши выводы и рекомендации.</p><p>Полные развернутые рекомендации обсуждаются именно на личной встрече с вашим консультантом. Этот документ содержит резюме к итоговой консультации и основные выводы.</p><div class="field"><div class="lb">Участник программы</div><div class="vl">ЕГЕНБЕРДИЕВА ДАМЕЛИ</div></div><div class="field"><div class="lb">Эксперт программы</div><div class="vl">Бапанова Асель С</div></div><div class="field"><div class="lb">Дата выдачи рекомендаций*</div><div class="vl">Август 2026 года</div></div><p class="small" style="margin-top:26px">*Обращаем ваше внимание, что рекомендации по вариантам поступления могут стать неактуальными в течение года, так как учебные заведения могут менять требования к поступающим, вступительные испытания и содержание учебных программ. Мы рекомендуем следить за актуальными новостями выбранных вами учебных заведений и уточнять информацию на момент поступления.</p></div><div class="pg"><div class="brand"><div class="blogo">S</div><div class="bname">Sana Space<i>Лаборатория карьерного проектирования</i></div></div><h2>1. Рекомендации по профессиональным векторам</h2><p>По итогам прохождения программы «Выбор профессии 3.0» были выявлены следующие профессиональные вектора, наиболее подходящие участнику программы для профессиональной реализации:</p><div class="vecpill main">Творческий<span class="tagmain">основной</span></div><div class="vecpill">Инженерный</div><p style="margin-top:16px">Именно в указанных профессиональных сферах с наибольшей вероятностью участник программы сможет реализовать свои интересы, склонности и потребности, которые были выявлены в процессе прохождения диагностик (тестов, диагностических игр и других заданий программы).</p><p>При подборе профессиональных сфер мы также ориентировались на востребованность профессий и профессиональные перспективы в выбранных сферах. Одним из важных условий подбора профессиональных векторов и профессий является их актуальность — востребованность на рынке труда.</p><p>Мы учитывали не только соответствие сферы особенностям участника программы, но и её востребованность как в настоящий момент, так и в перспективе. Так как одним из важных факторов удовлетворённости профессией является достойный уровень оплаты труда и возможность найти хорошую работу.</p><p style="margin-top:14px">При этом диагностики программы показывают, что в наибольшей степени интересам, потребностям и пожеланиям к профессии участника программы соответствует:</p><div class="vecpill main">Творческий</div><p>И именно этот профессиональный вектор мы рекомендуем рассмотреть как основной вариант для профессиональной реализации участника программы.</p></div><div class="pg"><div class="brand"><div class="blogo">S</div><div class="bname">Sana Space<i>Лаборатория карьерного проектирования</i></div></div><h2>2. Рекомендации по профессиям внутри выбранных профессиональных векторов</h2><p>При подборе конкретных профессий для участника программы внутри выбранных профессиональных векторов мы ориентировались на три критерия:</p><div class="crit"><b>Критерий 1</b>Профессия соответствует интересам участника программы или с большой вероятностью может его заинтересовать — так как у него есть похожие интересы, и в этой профессии надо делать то, что уже сейчас нравится делать участнику программы.</div><div class="crit"><b>Критерий 2</b>Профессия «доступна» для участника программы: доступны хорошие программы обучения данной профессии, он действительно может на них поступить, выучиться и освоить на хорошем уровне мастерства. При этом мы ориентировались в первую очередь на озвученные на этапе записи на программу пожелания и ограничения участника по вариантам обучения и поступления.</div><div class="crit"><b>Критерий 3</b>Выбранные профессии являются востребованными на рынке труда. И на сегодняшний день, и в перспективе в этих профессиях есть спрос на хороших специалистов, наблюдается нехватка квалифицированных кадров, и работодатели подтверждают, что профессионалы из этих сфер нужны и востребованы*.</div><p class="small">*Здесь мы считаем важным сделать комментарий про «востребованность профессий». Важно помнить, что востребованы всегда в первую очередь специалисты, а не профессии. Поэтому важным условием успешной профессиональной реализации в любой профессии является готовность учиться и развиваться в ней. Пожалуйста, не воспринимайте рекомендуемые нами профессии как 100% гарантию трудоустройства. Многое в этом вопросе зависит и от вас — прежде всего от вашего трудолюбия и готовности учиться, а не только от выбора «востребованной профессии».</p></div><div class="pg"><div class="brand"><div class="blogo">S</div><div class="bname">Sana Space<i>Лаборатория карьерного проектирования</i></div></div><p>Таким образом, по итогам прохождения программы «Выбор профессии 3.0» мы рекомендуем следующие профессии внутри выбранных профессиональных векторов (для вашего удобства мы также приводим краткое, простое и понятное описание рекомендованных профессий):</p><h3>Творческий</h3><p class="small">Профессии внутри данного вектора, которые рекомендованы участнику программы:</p><div class="pblock"><div class="pn">Дизайнер интерьеров, декоратор, хоумстейджер</div><div class="pd">Создаёт функциональные и эстетически привлекательные пространства для жилых или коммерческих объектов. Подбирает мебель, текстиль, предметы декора, а также оформляет недвижимость для продажи или сдачи.</div></div><h3>Инженерный</h3><p class="small">Профессии внутри данного вектора, которые рекомендованы участнику программы:</p><div class="pblock"><div class="pn">Архитектор</div><div class="pd">Разрабатывает архитектурные проекты, планирует и проектирует здания и сооружения, учитывая функциональность, эстетику и потребности клиентов.</div></div></div><div class="pg"><div class="brand"><div class="blogo">S</div><div class="bname">Sana Space<i>Лаборатория карьерного проектирования</i></div></div><h2>3. Рекомендации по образовательным траекториям</h2><p>При подборе образовательных траекторий учтены пожелания и ограничения участника программы по поступлению и обучению, которые обсуждались на этапе записи на программу.</p><p>При подборе вариантов обучения также учитывались рейтинги и репутация учебных заведений согласно общедоступным рейтингам учебных программ и учебных заведений и актуальной аналитике рынка образовательных услуг.</p><p>С учётом пожеланий участника программы при подборе вариантов обучения были выделены следующие критерии отбора:</p><h3>1. Форма обучения</h3><p>Очная</p><h3>2. Города для получения образования</h3><p>Алматы, Астана</p><h3>3. Платные формы обучения</h3><p>Рассматривались как запасной вариант.</p><h3>4. Рекомендованные варианты обучения</h3><div style="margin-top:12px"><div class="pn" style="font-weight:800">Варианты обучения в КазГАСА</div><div class="edu"><div class="ed">КазГАСА, программа «Архитектурный дизайн»</div><div class="eu">Сайт: https://kazgasa.kz/</div></div><div class="edu"><div class="ed">КазГАСА, программа «Дизайн интерьера»</div><div class="eu">Сайт: https://kazgasa.kz/</div></div></div><div style="margin-top:12px"><div class="pn" style="font-weight:800">Варианты обучения в КазНАИ им. Жургенова</div><div class="edu"><div class="ed">КазНАИ им. Жургенова, программа «Графический дизайн»</div><div class="eu">Сайт: https://kaznai.kz/</div></div></div></div><div class="pg"><div class="brand"><div class="blogo">S</div><div class="bname">Sana Space<i>Лаборатория карьерного проектирования</i></div></div><h2>Дополнительные комментарии</h2><div class="free">Черновик ИИ: тестовый анализ профиля.</div><div class="foot"><span>Sana Space · Бапанова Асель С</span><span>Август 2026 года</span></div></div></div></body></html>
